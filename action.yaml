@@ -1,20 +1,37 @@
-name: 'Hello World'
-description: 'Greet someone and record the time'
+name: "Hello World"
+description: "Greet someone and record the time"
+
 inputs:
-  token_action:  
-    description: 'The github access token'
+  token_action:
+    description: "The github access token"
     required: true
-    default: 'World'
-  warning_days: 
-    description: 'the time duration which warning people'
+  warning_time:
+    description: "the time duration which warning people"
     required: false
-    default: 0
-  error_days:
-    description: 'the time duration which error people'
+    default: ""
+  error_time:
+    description: "the time duration which error people"
     required: true
+    default: "10 0 0 0 0"
+  type:
+    description: "the type of message which need to send to robot"
+    required: false
+    default: "markdown"
+  uri_warn:
+    description: "the webhook_uri which corresponding to robot"
+    required: false
+    default: ""
+  uri_error:
+    description: "the webhook_uri which corresponding to robot"
+    required: true
+    default: ""
+  label_skip:
+    description: "this action will skip check the issue which labeled label_skip"
+    required: false
+    default: "none"
 outputs:
   time: # id of output
-    description: 'The time we greeted you'
+    description: "The time we greeted you"
 runs:
-  using: 'node16'
-  main: 'index.js'
+  using: "node16"
+  main: "index.js"
