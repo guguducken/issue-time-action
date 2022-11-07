@@ -15,6 +15,7 @@ const repo = {
     repo: "matrixone",
     owner: "matrixorigin"
 }
+const min = 10;
 
 
 //get oc client
@@ -107,10 +108,17 @@ async function main() {
                         core.info(">>> Warning " + num_warn + " issue: " + e.number + " - " + e.title + " update time: " + time_update.updatedAt);
                         continue;
                     }
+                    if (mess_warn[k].num >= min) {
+                        mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
+                        sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
+                        mess_warn[i] = { message: "============ **<font color=\"warning\">" + arr_label_check[i] + "</font>** ============\n", num: 0 };
+                    }
+                }
+                if (mess_warn[k].num >= 0) {
+                    mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
+                    sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
                 }
             }
-            mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
-            sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
         }
         core.info();
         core.info("total warning: " + num_warn);
