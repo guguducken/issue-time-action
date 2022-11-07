@@ -58,9 +58,9 @@ function checkFirst() {
 async function main() {
     try {
         //check input
-        checkFirst();
         core.info(arr_warn_time);
         core.info(arr_label_check);
+        checkFirst();
 
         let num_warn = 0;
 
