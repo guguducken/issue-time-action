@@ -68,7 +68,7 @@ async function main() {
 
         let mess_warn = new Array(t_warn.length);
         for (let i = 0; i < mess_warn.length; i++) {
-            mess_warn[i] = { message: "========**<font color=\"warning\">" + arr_label_check[i] + "</font>**========\n", num: 0 };
+            mess_warn[i] = { message: "============ **<font color=\"warning\">" + arr_label_check[i] + " Status Update Wanted !!!</font>** ============", num: 0 };
         }
         for (let k = 0; k < arr_label_check.length; k++) {
             let per_page = 100;
@@ -161,17 +161,17 @@ async function getMessage(type, issue, check) {
     switch (type) {
         case "warning":
             if (issue.assignees.length != 0) {
-                message = `<font color=\"info\">[Issue Expiration Warning]</font>\n[${issue.title}](${issue.html_url})\nAssignees: **${assig}**\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
+                message = `[${issue.title}](${issue.html_url})\nAssignees: **${assig}**\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
                 break;
             }
-            message = `<font color=\"info\">[Issue Expiration Warning]</font>\n[${issue.title}](${issue.html_url})\nAssignees: **No Assignee**\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
+            message = `[${issue.title}](${issue.html_url})\nAssignees: **No Assignee**\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
             break;
         case "error":
             if (issue.assignees.length != 0) {
-                message = `<font color=\"warning\">[Issue Expired Warning]</font>\n[${issue.title}](${issue.html_url})\nAssignees: **${assig}**\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
+                message = `[${issue.title}](${issue.html_url})\nAssignees: **${assig}**\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
                 break;
             }
-            message = `<font color=\"warning\">[Issue Expired Warning]</font>\n[${issue.title}](${issue.html_url})\nAssignees: **No Assignee**\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
+            message = `[${issue.title}](${issue.html_url})\nAssignees: **No Assignee**\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
             break;
         default:
             break;
@@ -322,7 +322,7 @@ async function getLastPRCommitUpdateTime(issue) {
     });
     let edges = repository.issue.timelineItems.edges;
 
-    while (edges.length == 0) {
+    while (edges.length != 0) {
         course = edges[0].cursor;
         for (let i = edges.length - 1; i >= 0; i++) {
             const e = edges[i];
