@@ -113,14 +113,17 @@ async function getMessage(type, issue, check) {
     let assig = "";
     for (let i = 0; i < issue.assignees.length; i++) {
         const u = issue.assignees[i];
-        assig = assig + "," + u.login;
+        assig = u.login + "," + assig;
+    }
+    if (assig[assig.length - 1] == ',') {
+        assig = assig.substring(0, assig.length - 1);
     }
     switch (type) {
         case "warning":
-            message = `<font color=\"info\">[Issue Expiration Warning]</font>\n[${issue.title}](${issue.url})\nAssignees: **${assig}**\nRepo: ${repo.owner}/${repo.repo}\nNumber: ${issue.number}\nCreate_At: ${issue.created_at}\nPassed: ${check.pass}`
+            message = `<font color=\"info\">[Issue Expiration Warning]</font>\n[${issue.title}](${issue.url})\nAssignees: \*\*${assig}\*\*\nRepo: ${repo.owner}/${repo.repo}\nNumber: ${issue.number}\nCreate_At: ${issue.created_at}\nPassed: ${check.pass}`
             break;
         case "error":
-            message = `<font color=\"warning\">[Issue Expired Warning]</font>\n[${issue.title}](${issue.url})\nAssignees: **${assig}**\nRepo: ${repo.owner}/${repo.repo}\nNumber: ${issue.number}\nUpdate_At: ${check.in}\nPassed: ${check.pass}`
+            message = `<font color=\"warning\">[Issue Expired Warning]</font>\n[${issue.title}](${issue.url})\nAssignees: \*\*${assig}\*\*\nRepo: ${repo.owner}/${repo.repo}\nNumber: ${issue.number}\nUpdate_At: ${check.in}\nPassed: ${check.pass}`
             break;
         default:
             break;
@@ -166,16 +169,16 @@ async function TimeCheck(ti) {
     }
     let duration = t_now - t_in;
     let millisecond = duration % 1000;
-    duration = duration / 1000;
+    duration = parseInt(duration / 1000);
 
     let second = duration % 60;
-    duration = duration / 60;
+    duration = parseInt(duration / 60);
 
     let minute = duration % 60;
-    duration = duration / 60;
+    duration = parseInt(duration / 60);
 
     let hour = duration % 24;
-    duration = duration / 24;
+    duration = parseInt(duration / 24);
 
     let day = duration;
 
