@@ -277,11 +277,14 @@ function checkLabel(issue) {
 }
 
 async function getLastPRCommitUpdateTime(issue) {
-    let query = `query ($repo: String!, $repo_owner: String!, $number_iss: Int!, $First: Int, $Skip: Int) {
+    let query = `query ($repo: String!, $repo_owner: String!, $number_iss: Int!, $Last: Int, $Course: String) {
   repository(name: $repo, owner: $repo_owner) {
     issue(number: $number_iss) {
       id
-      timelineItems(first: $First, skip: $Skip) {
+      timelineItems(
+        last: $Last
+        before: $Course
+      ) {
         updatedAt
         edges {
           node {
@@ -290,7 +293,6 @@ async function getLastPRCommitUpdateTime(issue) {
                 ... on PullRequest {
                   id
                   updatedAt
-                  title
                   createdAt
                 }
               }
@@ -299,9 +301,9 @@ async function getLastPRCommitUpdateTime(issue) {
               id
               updatedAt
               createdAt
-              body
             }
           }
+          cursor
         }
         pageInfo {
           hasNextPage
@@ -310,34 +312,32 @@ async function getLastPRCommitUpdateTime(issue) {
     }
   }
 }`;
-    let hasNext = true;
-    let start = 0;
     let per_page = 20;
-    let lastUpdate = 0;
+    let course = null;
     let lastPRORCommit = null;
 
-    while (hasNext) {
+    while (true) {
         let { repository } = await oc.graphql(query, {
             "repo": repo.repo,
             "repo_owner": repo.owner,
             "number_iss": issue.number,
-            "First": per_page,
-            "Skip": start
+            "Last": per_page,
+            "Course": course
         });
-        hasNext = repository.issue.timelineItems.pageInfo.hasNextPage;
-        start += per_page;
         let edges = repository.issue.timelineItems.edges;
-        for (let i = 0; i < edges.length; i++) {
+        if (edges.length == 0) {
+            break;
+        }
+        course = edges[0].cursor;
+        for (let i = edges.length - 1; i >= 0; i++) {
             const e = edges[i];
             if (e.node !== undefined && e.node.source !== undefined && Object.keys(e.node).length != 0 && Object.keys(e.node.source).length != 0) {
-                t = Date.parse(e.node.source.updatedAt);
-                if (t > lastUpdate) {
-                    lastUpdate = t;
-                    lastPRORCommit = e.node.source;
-                }
+                return e.node.source
             }
         }
+
     }
+
     return lastPRORCommit;
 }
 
