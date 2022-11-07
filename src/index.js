@@ -182,6 +182,7 @@ async function TimeCheck(ti) {
         return { in: ti, check_ans: 0, pass: "0d-0h:0m:0s" }
     }
     let duration = t_now - t_in;
+    let dura_t = t_now - t_in;
     let millisecond = duration % 1000;
     duration = parseInt(duration / 1000);
 
@@ -201,37 +202,24 @@ async function TimeCheck(ti) {
 
     //error check
     if (error_time.length != 0) {
-        if (day > parseInt(arr_error[0])) {
-            return { in: ti, check_ans: 2, pass: pass }
-        }
-        if (hour > parseInt(arr_error[1])) {
-            return { in: ti, check_ans: 2, pass: pass }
-        }
-        if (minute > parseInt(arr_error[2])) {
-            return { in: ti, check_ans: 2, pass: pass }
-        }
-        if (second > parseInt(arr_error[3])) {
-            return { in: ti, check_ans: 2, pass: pass }
-        }
-        if (millisecond > parseInt(arr_error[4])) {
+        t_err = arr_error[0];
+        t_err = t_err * 24 + arr_error[1];
+        t_err = t_err * 60 + arr_error[2];
+        t_err = t_err * 60 + arr_error[3];
+        t_err = t_err * 1000 + arr_error[4];
+        if (t_err <= dura_t) {
             return { in: ti, check_ans: 2, pass: pass }
         }
     }
+
     //warning check
     if (warn_time.length != 0) {
-        if (day > parseInt(arr_warn[0])) {
-            return { in: ti, check_ans: 1, pass: pass }
-        }
-        if (hour > parseInt(arr_warn[1])) {
-            return { in: ti, check_ans: 1, pass: pass }
-        }
-        if (minute > parseInt(arr_warn[2])) {
-            return { in: ti, check_ans: 1, pass: pass }
-        }
-        if (second > parseInt(arr_warn[3])) {
-            return { in: ti, check_ans: 1, pass: pass }
-        }
-        if (millisecond > parseInt(arr_warn[4])) {
+        t_warn = arr_warn[0];
+        t_warn = t_warn * 24 + arr_warn[1];
+        t_warn = t_warn * 60 + arr_warn[2];
+        t_warn = t_warn * 60 + arr_warn[3];
+        t_warn = t_warn * 1000 + arr_warn[4];
+        if (t_warn <= dura_t) {
             return { in: ti, check_ans: 1, pass: pass }
         }
     }
