@@ -100,7 +100,7 @@ async function main() {
                     let check_update = await TimeCheck(time_update.updatedAt, k);
                     if (!check_update.check_ans) {
                         let m = await getMessage("warning", issues[i], check_update);
-                        mess_warn[k].message += "-----------------------------";
+                        mess_warn[k].message += "-----------------------------\n";
                         mess_warn[k].message += m;
                         mess_warn[k].num++;
                         num_warn++;
