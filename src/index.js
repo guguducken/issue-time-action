@@ -107,7 +107,7 @@ async function main() {
                     }
                     if (mess_warn[k].num == 5) {
                         sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
-                        mess_warn[k].num = 0;
+                        mess_warn[k] = { message: ">>>>>>" + arr_label_check[k] + "<<<<<<", num: 0 };
                     }
                 }
             }
