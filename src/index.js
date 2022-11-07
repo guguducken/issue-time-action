@@ -144,7 +144,7 @@ async function getMessage(type, issue, check) {
     if (issue.assignees.length != 0) {
         for (let i = 0; i < issue.assignees.length; i++) {
             const u = issue.assignees[i];
-            assig = u.login + "," + assig;
+            assig = "[" + u.login + "](" + u.html_url + ")" + "," + assig;
         }
         if (assig[assig.length - 1] == ',') {
             assig = assig.substring(0, assig.length - 1);
