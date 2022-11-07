@@ -107,17 +107,17 @@ async function main() {
                         num_warn++;
                         core.info(">>> Warning " + num_warn + " issue: " + e.number + " - " + e.title + " update time: " + time_update.updatedAt);
                     }
-                    if (mess_warn[k].num >= min) {
-                        mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
-                        sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
-                        mess_warn[k] = { message: "============ **<font color=\"warning\">" + arr_label_check[k] + "</font>** ============\n", num: 0 };
-                    }
+                    // if (mess_warn[k].num >= min) {
+                    //     mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
+                    //     sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
+                    //     mess_warn[k] = { message: "============ **<font color=\"warning\">" + arr_label_check[k] + "</font>** ============\n", num: 0 };
+                    // }
                 }
             }
-            if (mess_warn[k].num > 0) {
-                mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
-                sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
-            }
+            // if (mess_warn[k].num > 0) {
+            //     mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
+            //     sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
+            // }
         }
         core.info();
         core.info("total warning: " + num_warn);
@@ -308,10 +308,41 @@ async function getLastPRCommitUpdateTime(issue) {
     }
   }
 }`;
+    let query_first = `query ($repo: String!, $repo_owner: String!, $number_iss: Int!, $Last: Int) {
+  repository(name: $repo, owner: $repo_owner) {
+    issue(number: $number_iss) {
+      id
+      timelineItems(
+        last: $Last
+      ) {
+        updatedAt
+        edges {
+          node {
+            ... on CrossReferencedEvent {
+              source {
+                ... on PullRequest {
+                  id
+                  updatedAt
+                  createdAt
+                }
+              }
+            }
+            ... on IssueComment {
+              id
+              updatedAt
+              createdAt
+            }
+          }
+          cursor
+        }
+      }
+    }
+  }
+}`;
     let per_page = 20;
     let course = null;
     let lastPRORCommit = null;
-    let { repository } = await oc.graphql(query, {
+    let { repository } = await oc.graphql(query_first, {
         "repo": repo.repo,
         "repo_owner": repo.owner,
         "number_iss": issue.number,
