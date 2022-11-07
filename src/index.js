@@ -308,41 +308,10 @@ async function getLastPRCommitUpdateTime(issue) {
     }
   }
 }`;
-    let query_first = `query ($repo: String!, $repo_owner: String!, $number_iss: Int!, $Last: Int) {
-  repository(name: $repo, owner: $repo_owner) {
-    issue(number: $number_iss) {
-      id
-      timelineItems(
-        last: $Last
-      ) {
-        updatedAt
-        edges {
-          node {
-            ... on CrossReferencedEvent {
-              source {
-                ... on PullRequest {
-                  id
-                  updatedAt
-                  createdAt
-                }
-              }
-            }
-            ... on IssueComment {
-              id
-              updatedAt
-              createdAt
-            }
-          }
-          cursor
-        }
-      }
-    }
-  }
-}`;
     let per_page = 20;
     let course = null;
     let lastPRORCommit = null;
-    let { repository } = await oc.graphql(query_first, {
+    let { repository } = await oc.graphql(query, {
         "repo": repo.repo,
         "repo_owner": repo.owner,
         "number_iss": issue.number,
@@ -357,8 +326,8 @@ async function getLastPRCommitUpdateTime(issue) {
             if (issue.number == 4950) {
                 core.info(JSON.stringify(e));
             }
-            if (e.node !== undefined && e.node.source !== undefined && Object.keys(e.node).length != 0 && Object.keys(e.node.source).length != 0) {
-                return e.node.source
+            if (e.node !== undefined && Object.keys(e.node).length != 0) {
+                return e.node
             }
         }
         data = await oc.graphql(query, {
