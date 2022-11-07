@@ -42,6 +42,7 @@ async function main() {
     try {
         //check input
         checkFirst();
+        core.info(arr_label_check);
 
         let num_warn = 0;
         let num_error = 0;
