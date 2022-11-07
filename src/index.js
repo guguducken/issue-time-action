@@ -323,7 +323,9 @@ async function getLastPRCommitUpdateTime(issue) {
         course = edges[0].cursor;
         for (let i = edges.length - 1; i >= 0; i--) {
             const e = edges[i];
-            core.info(i + " " + JSON.stringify(e));
+            if (issue.number == 4950) {
+                core.info(JSON.stringify(e));
+            }
             if (e.node !== undefined && e.node.source !== undefined && Object.keys(e.node).length != 0 && Object.keys(e.node.source).length != 0) {
                 return e.node.source
             }
@@ -336,7 +338,6 @@ async function getLastPRCommitUpdateTime(issue) {
             "Course": course
         });
         edges = data.repository.issue.timelineItems.edges;
-        core.info(JSON.stringify(edges));
     }
 
     return lastPRORCommit;
