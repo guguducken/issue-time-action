@@ -58,10 +58,11 @@ async function main() {
             now++;
             for (let i = 0; i < issues.length; i++) {
                 const e = issues[i];
+                core.info("check issue" + e.number + ": " + e.title);
                 if (e.pull_request === undefined || skipLabel(e) || !checkLabel(e)) { //跳过后续的检查和发送通知
+                    core.info("skip issue" + e.number + ": " + e.title);
                     continue;
                 }
-                core.info("check issue" + e.number + ": " + e.title);
                 //检查是否超过最长完成时间
                 core.info("cereate time: " + e.created_at);
                 let check_create = await TimeCheck(e.created_at);
@@ -226,7 +227,7 @@ function skipLabel(issue) {
         const label = issue.labels[i];
         for (let j = 0; j < arr_label_skip.length; j++) {
             const e = arr_label_skip[j];
-            if (label == e) {
+            if (label === e) {
                 return true
             }
         }
@@ -243,7 +244,7 @@ function checkLabel(issue) {
         const label = issue.labels[i];
         for (let j = 0; j < arr_label_check.length; j++) {
             const e = arr_label_check[j];
-            if (label == e) {
+            if (label === e) {
                 return true
             }
         }

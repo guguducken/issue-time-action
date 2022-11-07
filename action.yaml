@@ -28,7 +28,7 @@ inputs:
   label_skip:
     description: "this action will skip check the issue which labeled label_skip"
     required: false
-    default: "none"
+    default: ""
   label_check:
     description: "the label of issue which need to check"
     required: true
