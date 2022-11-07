@@ -8,7 +8,6 @@ inputs:
   warning_time:
     description: "the time duration which warning people"
     required: true
-    default: "24 72 168"
   type:
     description: "the type of message which need to send to robot"
     required: false
@@ -16,7 +15,6 @@ inputs:
   uri_warn:
     description: "the webhook_uri which corresponding to robot"
     required: true
-    default: ""
   label_skip:
     description: "this action will skip check the issue which labeled label_skip"
     required: false
