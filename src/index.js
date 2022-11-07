@@ -112,17 +112,17 @@ async function main() {
                         num_warn++;
                         core.info(">>> Warning " + num_warn + " issue: " + e.number + " - " + e.title + " update time: " + time_update.updatedAt);
                     }
-                    // if (mess_warn[k].num != 0 && mess_warn[k].num % min == 0) {
-                    //     mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
-                    //     sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
-                    //     mess_warn[k].message = "**<font color=\"warning\">" + arr_label_check[k] + " Status Update Wanted !!!</font>**\n";
-                    // }
+                    if (mess_warn[k].num != 0 && mess_warn[k].num % min == 0) {
+                        mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
+                        sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
+                        mess_warn[k].message = "**<font color=\"warning\">" + arr_label_check[k] + " Status Update Wanted !!!</font>**\n";
+                    }
                 }
             }
-            // if (mess_warn[k].num > 0) {
-            //     mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
-            //     sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
-            // }
+            if (mess_warn[k].num > 0) {
+                mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
+                sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
+            }
             mention_message += arr_label_check[k] + " total: " + mess_warn[k].num + "\n";
         }
         sendWeComMessage(uri_warn, "text", mention_message, arr_mention);
