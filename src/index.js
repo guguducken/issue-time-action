@@ -140,7 +140,10 @@ async function getIssues(now, num_page, label) {
     if (iss.length == 0) {
         return undefined;
     }
-    core.info(iss[0].labels.name);
+    for (let i = 0; i < iss.length; i++) {
+        const e = iss[i];
+        console.log(e.number);
+    }
     return iss;
 }
 
@@ -230,12 +233,13 @@ async function TimeCheck(ti, ind) {
     let day = duration;
 
     let pass = `${day}d-${hour}h:${minute}m:${second}s`
-    core.info("in TimeCheck: " + pass + " dura_t: " + dura_t);
 
     if (dura_t > t_warn[ind]) {
+        core.info("in TimeCheck: " + pass + " dura_t: " + dura_t + " flag: false");
         return { in: ti, check_ans: false, pass: pass }
     }
 
+    core.info("in TimeCheck: " + pass + " dura_t: " + dura_t + " flag: true");
     return { in: ti, check_ans: true, pass: pass }
 }
 
