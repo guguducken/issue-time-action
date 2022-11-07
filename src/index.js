@@ -323,9 +323,6 @@ async function getLastPRCommitUpdateTime(issue) {
         course = edges[0].cursor;
         for (let i = edges.length - 1; i >= 0; i--) {
             const e = edges[i];
-            if (issue.number == 6317) {
-                core.info(JSON.stringify(e));
-            }
             if (e.node !== undefined && Object.keys(e.node).length != 0) {
                 if (e.node.source !== undefined && Object.keys(e.node.source).length != 0) {
                     return e.node.source
