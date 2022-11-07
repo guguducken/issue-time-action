@@ -128,7 +128,6 @@ async function getIssues(now, num_page) {
             state: "open",
             sort: "created",
             direction: "desc",
-            labels: label_check,
             per_page: num_page,
             page: now
         }
