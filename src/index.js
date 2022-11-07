@@ -109,9 +109,8 @@ async function main() {
                     }
                 }
             }
-            if (mess_warn[k].num != 0) {
-                sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
-            }
+            mess_warn[k].message += "-----------------------------\n**Total: " + mess_warn[k].num;
+            sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
         }
         core.info();
         core.info("total warning: " + num_warn);
