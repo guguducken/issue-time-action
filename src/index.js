@@ -28,13 +28,14 @@ const arr_label_check = label_check.split(",");
 //get the timestamp of now
 const t_now = new Date().getTime();
 
-async function checkFirst() {
+function checkFirst() {
     if (arr_warn.length != 5 || arr_error.length != 5) {
         throw new Error("The time of warning or error is invalid. Please check your Input")
     }
     if (uri_error.length == 0) {
         throw new Error("The Webhook of error notice(uri_error) is invalid");
     }
+    core.info("First check pass....");
 }
 
 async function main() {
@@ -51,6 +52,7 @@ async function main() {
         while (true) {
             let issues = await getIssues(now, per_page);
             if (issues === undefined) {
+                core.info("Job finish....");
                 break;
             }
             now++;
