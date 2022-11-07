@@ -22,9 +22,15 @@ inputs:
   label_check:
     description: "the label of issue which need to check"
     required: true
-outputs:
-  time: # id of output
-    description: "The time we greeted you"
+  repo_name:
+    description: "the repo"
+    required: true
+  repo_owner:
+    description: "the owner of repo"
+    required: true
+  mentions:
+    description: "mention list"
+    required: false
 runs:
   using: "node16"
   main: "src/index.js"

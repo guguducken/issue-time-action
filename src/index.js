@@ -5,15 +5,18 @@ const axios = require('axios');
 //get variables
 const uri_warn = core.getInput('uri_warn', { required: true });
 const token = core.getInput('token_action', { required: true });
+const repo_name = core.getInput('repo_name', { required: true });
+const repo_owner = core.getInput('repo_owner', { required: true });
 const warn_time = core.getInput('warning_time', { required: true });
 const label_check = core.getInput('label_check', { required: true });
 const label_skip = core.getInput('label_skip', { required: false });
 const type_message = core.getInput('type', { required: false });
+const mentions_l = core.getInput('mentions', { required: false });
 
 // const repo = github.context.repo
 const repo = {
-    repo: "matrixone",
-    owner: "matrixorigin"
+    repo: repo_name,
+    owner: repo_owner
 }
 const min = 10;
 
@@ -23,6 +26,7 @@ const oc = github.getOctokit(token);
 const arr_label_skip = label_skip.split(",");
 const arr_label_check = label_check.split(",");
 const arr_warn_time = warn_time.split(" ");
+const arr_mention = mentions_l.split(",");
 
 //get the timestamp of now
 const t_now = new Date().getTime();
@@ -119,6 +123,7 @@ async function main() {
                 sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
             }
         }
+        sendWeComMessage(uri_warn, "text", "", arr_mention);
         core.info();
         core.info("total warning: " + num_warn);
         core.info("total issues: " + num_sum);
@@ -158,6 +163,7 @@ async function getMessage(type, issue, check) {
             assig = assig.substring(0, assig.length - 1);
         }
     }
+
     switch (type) {
         case "warning":
             if (issue.assignees.length != 0) {
