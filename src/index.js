@@ -58,8 +58,6 @@ function checkFirst() {
 async function main() {
     try {
         //check input
-        core.info(arr_warn_time);
-        core.info(arr_label_check);
         checkFirst();
 
         let num_warn = 0;
@@ -93,7 +91,7 @@ async function main() {
                         updatedAt: e.created_at,
                     }
                 }
-                core.info("pr or update time: " + time_update.updatedAt);
+                core.info("issue: " + e.number + " - " + e.title + " update time: " + time_update.updatedAt);
                 let check_update = await TimeCheck(time_update.updatedAt, ind_label);
                 if (!check_update.check_ans) {
                     let m = await getMessage("warning", issues[i], check_update);
