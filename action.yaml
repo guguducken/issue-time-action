@@ -7,21 +7,13 @@ inputs:
     required: true
   warning_time:
     description: "the time duration which warning people"
-    required: false
-    default: "3 0 0 0 0"
-  error_time:
-    description: "the time duration which error people"
     required: true
-    default: "10 0 0 0 0"
+    default: "24 72 168"
   type:
     description: "the type of message which need to send to robot"
     required: false
     default: "markdown"
   uri_warn:
-    description: "the webhook_uri which corresponding to robot"
-    required: false
-    default: ""
-  uri_error:
     description: "the webhook_uri which corresponding to robot"
     required: true
     default: ""
