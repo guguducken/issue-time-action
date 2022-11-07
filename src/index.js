@@ -105,16 +105,15 @@ async function main() {
                         core.info(">>> Warning " + num_warn + "issue: " + e.number + " - " + e.title + " update time: " + time_update.updatedAt);
                         continue;
                     }
+                    if (mess_warn[k].num == 5) {
+                        sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
+                        mess_warn[k].num = 0;
+                    }
                 }
             }
-        }
-        for (let i = 0; i < mess_warn.length; i++) {
-            const e = mess_warn[i];
-            if (e.num == 0) {
-                core.info(arr_label_check[i] + " is not expired <<<<");
-                continue;
+            if (mess_warn[k].num != 0) {
+                sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
             }
-            sendWeComMessage(uri_warn, type_message, mess_warn[i].message, "");
         }
         core.info();
         core.info("total warning: " + num_warn);
@@ -140,7 +139,7 @@ async function getIssues(now, num_page, label) {
     if (iss.length == 0) {
         return undefined;
     }
-    core.info(iss[0].labels);
+    core.info(iss[0].labels.name);
     return iss;
 }
 
