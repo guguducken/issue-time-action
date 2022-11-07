@@ -117,7 +117,7 @@ async function main() {
                     }
                     if (mess_warn[k].num >= min) {
                         mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
-                        sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
+                        await sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
                         mess_warn[k].message = "**<font color=\"warning\">" + arr_label_check[k] + " Status Update Wanted !!!</font>**\n";
                         mess_warn[k].num = 0;
                     }
@@ -125,7 +125,7 @@ async function main() {
             }
             if (mess_warn[k].num > 0) {
                 mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
-                sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
+                await sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
             }
             mention_message += arr_label_check[k] + " total: " + num_warn_split[k] + "\n";
         }
