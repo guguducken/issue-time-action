@@ -328,15 +328,14 @@ async function getLastPRCommitUpdateTime(issue) {
                 return e.node.source
             }
         }
-        repository = await oc.graphql(query, {
+        data = await oc.graphql(query, {
             "repo": repo.repo,
             "repo_owner": repo.owner,
             "number_iss": issue.number,
             "Last": per_page,
             "Course": course
         });
-        core.info(JSON.stringify(repository));
-        edges = repository.issue.timelineItems.edges;
+        edges = data.repository.issue.timelineItems.edges;
         core.info(JSON.stringify(edges));
     }
 
