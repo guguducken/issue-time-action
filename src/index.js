@@ -64,13 +64,15 @@ async function main() {
         let num_sum = 0;
 
         //coding
-        let per_page = 100;
-        let now = 1;
+
         let mess_warn = new Array(t_warn.length);
         for (let i = 0; i < mess_warn.length; i++) {
             mess_warn[i] = { message: ">>>>>>" + arr_label_check[i] + "<<<<<<", num: 0 };
         }
         for (let k = 0; k < arr_label_check.length; k++) {
+            let per_page = 100;
+            let now = 1;
+
             while (true) {
                 let issues = await getIssues(now, per_page, arr_label_check[k]);
                 if (issues === undefined) {
@@ -135,10 +137,10 @@ async function getIssues(now, num_page, label) {
             page: now
         }
     );
-    core.info(JSON.stringify(iss));
     if (iss.length == 0) {
         return undefined;
     }
+    core.info(iss[0].labels);
     return iss;
 }
 
