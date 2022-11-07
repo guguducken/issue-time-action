@@ -225,7 +225,7 @@ function skipLabel(issue) {
         return false
     }
     for (let i = 0; i < issue.labels.length; i++) {
-        const label = issue.labels[i];
+        const label = issue.labels[i].name;
         for (let j = 0; j < arr_label_skip.length; j++) {
             const e = arr_label_skip[j];
             if (label === e) {
@@ -242,7 +242,7 @@ function checkLabel(issue) {
         return false
     }
     for (let i = 0; i < issue.labels.length; i++) {
-        const label = issue.labels[i];
+        const label = issue.labels[i].name;
         for (let j = 0; j < arr_label_check.length; j++) {
             const e = arr_label_check[j];
             if (label === e) {
