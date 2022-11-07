@@ -76,7 +76,7 @@ async function main() {
             while (true) {
                 let issues = await getIssues(now, per_page, arr_label_check[k]);
                 if (issues === undefined) {
-                    core.info(">>>>>>> Job finish <<<<<<<");
+                    core.info("\>\>\>\>\>\>\> Job finish <<<<<<<");
                     break;
                 }
                 now++;
@@ -105,10 +105,6 @@ async function main() {
                         num_warn++;
                         core.info(">>> Warning " + num_warn + " issue: " + e.number + " - " + e.title + " update time: " + time_update.updatedAt);
                         continue;
-                    }
-                    if (mess_warn[k].num == 5) {
-                        sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
-                        mess_warn[k] = { message: ">>>>>>" + arr_label_check[k] + "<<<<<<", num: 0 };
                     }
                 }
             }
@@ -162,17 +158,17 @@ async function getMessage(type, issue, check) {
     switch (type) {
         case "warning":
             if (issue.assignees.length != 0) {
-                message = `<font color=\"info\">[Issue Expiration Warning]</font>\n[${issue.title}](${issue.html_url})\nAssignees: **${assig}**\nRepo: ${repo.owner}/${repo.repo}\nNumber: ${issue.number}\nCreate_At: ${issue.created_at}\nPassed: ${check.pass}\n`
+                message = `<font color=\"info\">[Issue Expiration Warning]</font>\n[${issue.title}](${issue.html_url})\nAssignees: **${assig}**\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
                 break;
             }
-            message = `<font color=\"info\">[Issue Expiration Warning]</font>\n[${issue.title}](${issue.html_url})\nAssignees: **No Assignee**\nRepo: ${repo.owner}/${repo.repo}\nNumber: ${issue.number}\nCreate_At: ${issue.created_at}\nPassed: ${check.pass}\n`
+            message = `<font color=\"info\">[Issue Expiration Warning]</font>\n[${issue.title}](${issue.html_url})\nAssignees: **No Assignee**\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
             break;
         case "error":
             if (issue.assignees.length != 0) {
-                message = `<font color=\"warning\">[Issue Expired Warning]</font>\n[${issue.title}](${issue.html_url})\nAssignees: **${assig}**\nRepo: ${repo.owner}/${repo.repo}\nNumber: ${issue.number}\nUpdate_At: ${check.in}\nPassed: ${check.pass}\n`
+                message = `<font color=\"warning\">[Issue Expired Warning]</font>\n[${issue.title}](${issue.html_url})\nAssignees: **${assig}**\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
                 break;
             }
-            message = `<font color=\"warning\">[Issue Expired Warning]</font>\n[${issue.title}](${issue.html_url})\nAssignees: **No Assignee**\nRepo: ${repo.owner}/${repo.repo}\nNumber: ${issue.number}\nUpdate_At: ${check.in}\nPassed: ${check.pass}\n`
+            message = `<font color=\"warning\">[Issue Expired Warning]</font>\n[${issue.title}](${issue.html_url})\nAssignees: **No Assignee**\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
             break;
         default:
             break;
@@ -235,11 +231,11 @@ async function TimeCheck(ti, ind) {
     let pass = `${day}d-${hour}h:${minute}m:${second}s`
 
     if (dura_t > t_warn[ind]) {
-        core.info("in TimeCheck: " + pass + " dura_t: " + dura_t + " flag: false");
+        core.info("in TimeCheck: " + ti + " >> " + pass + " >> dura_t: " + dura_t);
         return { in: ti, check_ans: false, pass: pass }
     }
 
-    core.info("in TimeCheck: " + pass + " dura_t: " + dura_t + " flag: true");
+    core.info("in TimeCheck: " + ti + " >> " + pass + " >> dura_t: " + dura_t);
     return { in: ti, check_ans: true, pass: pass }
 }
 
