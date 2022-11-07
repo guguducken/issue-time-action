@@ -315,19 +315,15 @@ async function getLastPRCommitUpdateTime(issue) {
     let per_page = 20;
     let course = null;
     let lastPRORCommit = null;
+    let { repository } = await oc.graphql(query, {
+        "repo": repo.repo,
+        "repo_owner": repo.owner,
+        "number_iss": issue.number,
+        "Last": per_page,
+    });
+    let edges = repository.issue.timelineItems.edges;
 
-    while (true) {
-        let { repository } = await oc.graphql(query, {
-            "repo": repo.repo,
-            "repo_owner": repo.owner,
-            "number_iss": issue.number,
-            "Last": per_page,
-            "Course": course
-        });
-        let edges = repository.issue.timelineItems.edges;
-        if (edges.length == 0) {
-            break;
-        }
+    while (edges.length == 0) {
         course = edges[0].cursor;
         for (let i = edges.length - 1; i >= 0; i++) {
             const e = edges[i];
@@ -335,6 +331,13 @@ async function getLastPRCommitUpdateTime(issue) {
                 return e.node.source
             }
         }
+        repository = await oc.graphql(query, {
+            "repo": repo.repo,
+            "repo_owner": repo.owner,
+            "number_iss": issue.number,
+            "Last": per_page,
+            "Course": course
+        });
 
     }
 
