@@ -61,6 +61,7 @@ async function main() {
         checkFirst();
 
         let num_warn = 0;
+        let num_sum = 0;
 
         //coding
         let per_page = 100;
@@ -83,6 +84,7 @@ async function main() {
                     // core.info("skip PR/issue " + e.number + ": " + e.title + " <<<<<<<<\n");
                     continue;
                 }
+                num_sum++;
 
                 //检查更新时间
                 let time_update = await getLastPRCommitUpdateTime(e);
@@ -112,6 +114,7 @@ async function main() {
         }
         core.info();
         core.info("total warning: " + num_warn);
+        core.info("total issues: " + num_sum);
     } catch (err) {
         core.setFailed(err.message);
     }
