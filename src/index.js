@@ -68,7 +68,7 @@ async function main() {
 
         let mess_warn = new Array(t_warn.length);
         for (let i = 0; i < mess_warn.length; i++) {
-            mess_warn[i] = { message: "**<font color=\"warning\">" + arr_label_check[i] + " Status Update Wanted !!!</font>**", num: 0 };
+            mess_warn[i] = { message: "**<font color=\"warning\">" + arr_label_check[i] + " Status Update Wanted !!!</font>**\n", num: 0 };
         }
         for (let k = 0; k < arr_label_check.length; k++) {
             let per_page = 100;
@@ -110,7 +110,7 @@ async function main() {
                     if (mess_warn[k].num >= min) {
                         mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
                         sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
-                        mess_warn[k] = { message: "**<font color=\"warning\">" + arr_label_check[k] + " Status Update Wanted !!!</font>**", num: 0 };
+                        mess_warn[k] = { message: "**<font color=\"warning\">" + arr_label_check[k] + " Status Update Wanted !!!</font>**\n", num: 0 };
                     }
                 }
             }
