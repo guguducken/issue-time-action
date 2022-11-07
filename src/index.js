@@ -304,9 +304,6 @@ async function getLastPRCommitUpdateTime(issue) {
           }
           cursor
         }
-        pageInfo {
-          hasNextPage
-        }
       }
     }
   }
@@ -339,6 +336,7 @@ async function getLastPRCommitUpdateTime(issue) {
             "Course": course
         });
         edges = repository.issue.timelineItems.edges;
+        core.info(JSON.stringify(edges));
     }
 
     return lastPRORCommit;
