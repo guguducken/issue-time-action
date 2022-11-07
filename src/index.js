@@ -125,7 +125,8 @@ async function getIssues(now, num_page) {
             ...repo,
             state: "open",
             sort: "created",
-            direction: "asc",
+            direction: "desc",
+            labels: label_check,
             per_page: num_page,
             page: now
         }
