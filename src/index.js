@@ -86,8 +86,13 @@ async function main() {
 
                 //检查更新时间
                 let time_update = await getLastPRCommitUpdateTime(e);
+                if (time_update === null) {
+                    time_update = {
+                        updatedAt: e.created_at,
+                    }
+                }
                 core.info("pr or update time: " + time_update.updatedAt);
-                let check_update = await TimeCheck(time_update);
+                let check_update = await TimeCheck(time_update.updatedAt);
                 if (check_update.check_ans == 1 && uri_warn.length != 0) {
                     // sendWeComMessage(uri_warn, type_message, await getMessage("warning", issues[i], check_update), "");
                     num_warn++;
