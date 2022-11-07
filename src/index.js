@@ -96,24 +96,25 @@ async function main() {
                             updatedAt: e.created_at,
                         }
                     }
+                    core.info("issue number: " + e.number);
                     let check_update = await TimeCheck(time_update.updatedAt, k);
                     if (!check_update.check_ans) {
                         let m = await getMessage("warning", issues[i], check_update);
                         mess_warn[k].message += m;
                         mess_warn[k].num++;
                         num_warn++;
-                        core.info(">>> Warning " + num_warn + "issue: " + e.number + " - " + e.title + " update time: " + time_update.updatedAt);
+                        core.info(">>> Warning " + num_warn + " issue: " + e.number + " - " + e.title + " update time: " + time_update.updatedAt);
                         continue;
                     }
-                    // if (mess_warn[k].num == 5) {
-                    //     sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
-                    //     mess_warn[k] = { message: ">>>>>>" + arr_label_check[k] + "<<<<<<", num: 0 };
-                    // }
+                    if (mess_warn[k].num == 5) {
+                        sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
+                        mess_warn[k] = { message: ">>>>>>" + arr_label_check[k] + "<<<<<<", num: 0 };
+                    }
                 }
             }
-            // if (mess_warn[k].num != 0) {
-            //     sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
-            // }
+            if (mess_warn[k].num != 0) {
+                sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
+            }
         }
         core.info();
         core.info("total warning: " + num_warn);
