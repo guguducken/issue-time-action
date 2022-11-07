@@ -337,7 +337,7 @@ async function getLastPRCommitUpdateTime(issue) {
             "Last": per_page,
             "Course": course
         });
-
+        edges = repository.issue.timelineItems.edges;
     }
 
     return lastPRORCommit;
