@@ -12,11 +12,11 @@ const warn_time = core.getInput('warning_time', { required: false });
 const label_skip = core.getInput('label_skip', { required: false });
 const label_check = core.getInput('label_check', { required: true });
 
-// const repo = github.context.repo
-const repo = {
-    repo: "matrixone",
-    owner: "matrixorigin"
-}
+const repo = github.context.repo
+// const repo = {
+//     repo: "matrixone",
+//     owner: "matrixorigin"
+// }
 
 //get oc client
 const oc = github.getOctokit(token);
