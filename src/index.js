@@ -59,7 +59,9 @@ async function main() {
                 if (e.pull_request === undefined || skipLabel(e) || !checkLabel(e)) { //跳过后续的检查和发送通知
                     continue;
                 }
+                core.info("check issue" + e.number + ": " + e.title);
                 //检查是否超过最长完成时间
+                core.info("cereate time: " + e.created_at);
                 let check_create = await TimeCheck(e.created_at);
                 if (check_create.check_ans == 2 && uri_error.length != 0) {
                     sendWeComMessage(uri_error, type_message, await getMessage("error", issues[i], check_create), "");
@@ -69,6 +71,7 @@ async function main() {
 
                 //检查更新时间
                 let time_update = await getLastPRCommitUpdateTime(e);
+                core.info("pr or update time: " + time_update.updatedAt);
                 let check_update = await TimeCheck(time_update);
                 if (check_update.check_ans == 1 && uri_warn.length != 0) {
                     sendWeComMessage(uri_warn, type_message, await getMessage("warning", issues[i], check_update), "");
@@ -284,7 +287,7 @@ async function getLastPRCommitUpdateTime(issue) {
     let start = 0;
     let per_page = 20;
     let lastUpdate = 0;
-    let lastPR = null;
+    let lastPRORCommit = null;
 
     while (hasNext) {
         let { repository } = await oc.graphql(query, {
@@ -303,12 +306,12 @@ async function getLastPRCommitUpdateTime(issue) {
                 t = Date.parse(e.node.source.updatedAt);
                 if (t > lastUpdate) {
                     lastUpdate = t;
-                    lastPR = e.node.source;
+                    lastPRORCommit = e.node.source;
                 }
             }
         }
     }
-    return lastPR;
+    return lastPRORCommit;
 }
 
 main();
