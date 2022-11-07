@@ -27,8 +27,8 @@ const arr_label_check = label_check.split(",");
 
 //get the timestamp of now
 const t_now = new Date().getTime();
-let t_err = arr_error[0];
-let t_warn = arr_warn[0];
+let t_err = parseInt(arr_error[0]);
+let t_warn = parseInt(arr_warn[0]);
 
 function checkFirst() {
     if (arr_warn.length != 5 || arr_error.length != 5) {
@@ -37,14 +37,14 @@ function checkFirst() {
     if (uri_error.length == 0) {
         throw new Error("The Webhook of error notice(uri_error) is invalid");
     }
-    t_err = t_err * 24 + arr_error[1];
-    t_err = t_err * 60 + arr_error[2];
-    t_err = t_err * 60 + arr_error[3];
-    t_err = t_err * 1000 + arr_error[4];
-    t_warn = t_warn * 24 + arr_warn[1];
-    t_warn = t_warn * 60 + arr_warn[2];
-    t_warn = t_warn * 60 + arr_warn[3];
-    t_warn = t_warn * 1000 + arr_warn[4];
+    t_err = t_err * 24 + parseInt(arr_error[1]);
+    t_err = t_err * 60 + parseInt(arr_error[2]);
+    t_err = t_err * 60 + parseInt(arr_error[3]);
+    t_err = t_err * 1000 + parseInt(arr_error[4]);
+    t_warn = t_warn * 24 + parseInt(arr_warn[1]);
+    t_warn = t_warn * 60 + parseInt(arr_warn[2]);
+    t_warn = t_warn * 60 + parseInt(arr_warn[3]);
+    t_warn = t_warn * 1000 + parseInt(arr_warn[4]);
     core.info("First check pass....");
 }
 
