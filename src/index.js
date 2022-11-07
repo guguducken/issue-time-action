@@ -164,7 +164,7 @@ async function TimeCheck(ti) {
     if (t_in >= t_now) {
         return { in: ti, check_ans: 0, pass: "0d-0h:0m:0s" }
     }
-    let duration = t.now - t_in;
+    let duration = t_now - t_in;
     let millisecond = duration % 1000;
     duration /= 1000;
 
