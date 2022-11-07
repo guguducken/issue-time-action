@@ -60,6 +60,8 @@ async function main() {
         //coding
         let per_page = 100;
         let now = 1;
+        let mess_warn = "";
+        let mess_error = "";
         while (true) {
             let issues = await getIssues(now, per_page);
             if (issues === undefined) {
@@ -79,7 +81,8 @@ async function main() {
                 core.info("cereate time: " + e.created_at);
                 let check_create = await TimeCheck(e.created_at);
                 if (check_create.check_ans == 2 && uri_error.length != 0) {
-                    sendWeComMessage(uri_error, type_message, await getMessage("error", issues[i], check_create), "");
+                    mess_error += `----------------\n`;
+                    mess_error += await getMessage("error", issues[i], check_create);
                     num_error++;
                     continue;
                 }
@@ -94,12 +97,20 @@ async function main() {
                 core.info("pr or update time: " + time_update.updatedAt);
                 let check_update = await TimeCheck(time_update.updatedAt);
                 if (check_update.check_ans == 1 && uri_warn.length != 0) {
-                    sendWeComMessage(uri_warn, type_message, await getMessage("warning", issues[i], check_update), "");
+                    mess_warn += `----------------\n`;
+                    mess_warn += await getMessage("warning", issues[i], check_update);
                     num_warn++;
                     continue;
                 }
 
             }
+        }
+        if (mess_error.length != 0) {
+
+            sendWeComMessage(uri_error, type_message, mess_error, "");
+        }
+        if (mess_warn.length != 0) {
+            sendWeComMessage(uri_warn, type_message, mess_warn, "");
         }
         core.info();
         core.info("total warning: " + num_warn);
