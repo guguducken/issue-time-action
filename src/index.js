@@ -60,7 +60,7 @@ async function main() {
                 const e = issues[i];
                 core.info("check issue" + e.number + ": " + e.title);
                 if (e.pull_request === undefined || skipLabel(e) || !checkLabel(e)) { //跳过后续的检查和发送通知
-                    core.info("skip issue" + e.number + ": " + e.title);
+                    core.info("skip issue" + e.number + ": " + e.title + "reason: " + e.pull_request + " " + skipLabel(e) + " " + !checkLabel(e));
                     continue;
                 }
                 //检查是否超过最长完成时间
