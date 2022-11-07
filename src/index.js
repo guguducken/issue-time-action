@@ -68,7 +68,7 @@ async function main() {
 
         let mess_warn = new Array(t_warn.length);
         for (let i = 0; i < mess_warn.length; i++) {
-            mess_warn[i] = { message: "============ **<font color=\"warning\">" + arr_label_check[i] + " Status Update Wanted !!!</font>** ============", num: 0 };
+            mess_warn[i] = { message: "**<font color=\"warning\">" + arr_label_check[i] + " Status Update Wanted !!!</font>**", num: 0 };
         }
         for (let k = 0; k < arr_label_check.length; k++) {
             let per_page = 100;
@@ -107,17 +107,17 @@ async function main() {
                         num_warn++;
                         core.info(">>> Warning " + num_warn + " issue: " + e.number + " - " + e.title + " update time: " + time_update.updatedAt);
                     }
-                    // if (mess_warn[k].num >= min) {
-                    //     mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
-                    //     sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
-                    //     mess_warn[k] = { message: "============ **<font color=\"warning\">" + arr_label_check[k] + "</font>** ============\n", num: 0 };
-                    // }
+                    if (mess_warn[k].num >= min) {
+                        mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
+                        sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
+                        mess_warn[k] = { message: "**<font color=\"warning\">" + arr_label_check[k] + " Status Update Wanted !!!</font>**", num: 0 };
+                    }
                 }
             }
-            // if (mess_warn[k].num > 0) {
-            //     mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
-            //     sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
-            // }
+            if (mess_warn[k].num > 0) {
+                mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
+                sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
+            }
         }
         core.info();
         core.info("total warning: " + num_warn);
@@ -323,9 +323,6 @@ async function getLastPRCommitUpdateTime(issue) {
         course = edges[0].cursor;
         for (let i = edges.length - 1; i >= 0; i--) {
             const e = edges[i];
-            if (issue.number == 6324) {
-                core.info(JSON.stringify(e));
-            }
             if (e.node !== undefined && Object.keys(e.node).length != 0) {
                 if (e.node.source !== undefined && Object.keys(e.node.source).length != 0) {
                     return e.node.source
