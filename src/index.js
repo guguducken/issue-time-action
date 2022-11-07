@@ -133,6 +133,7 @@ async function getIssues(now, num_page) {
             page: now
         }
     );
+    core.info(JSON.stringify(iss));
     if (iss.length == 0) {
         return undefined;
     }
