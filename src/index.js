@@ -213,7 +213,7 @@ async function TimeCheck(ti) {
     let day = duration;
 
     let pass = `${day}d-${hour}h:${minute}m:${second}s`
-    core.info("in TimeCheck: " + pass);
+    core.info("in TimeCheck: " + pass + " dura_t: " + dura_t);
 
     //error check
     if (error_time.length != 0 && t_err <= dura_t) {
