@@ -35,6 +35,16 @@ function checkFirst() {
     if (uri_error.length == 0) {
         throw new Error("The Webhook of error notice(uri_error) is invalid");
     }
+    let t_err = arr_error[0];
+    t_err = t_err * 24 + arr_error[1];
+    t_err = t_err * 60 + arr_error[2];
+    t_err = t_err * 60 + arr_error[3];
+    t_err = t_err * 1000 + arr_error[4];
+    let t_warn = arr_warn[0];
+    t_warn = t_warn * 24 + arr_warn[1];
+    t_warn = t_warn * 60 + arr_warn[2];
+    t_warn = t_warn * 60 + arr_warn[3];
+    t_warn = t_warn * 1000 + arr_warn[4];
     core.info("First check pass....");
 }
 
@@ -201,27 +211,13 @@ async function TimeCheck(ti) {
     core.info("in TimeCheck: " + pass);
 
     //error check
-    if (error_time.length != 0) {
-        t_err = arr_error[0];
-        t_err = t_err * 24 + arr_error[1];
-        t_err = t_err * 60 + arr_error[2];
-        t_err = t_err * 60 + arr_error[3];
-        t_err = t_err * 1000 + arr_error[4];
-        if (t_err <= dura_t) {
-            return { in: ti, check_ans: 2, pass: pass }
-        }
+    if (error_time.length != 0 && t_err <= dura_t) {
+        return { in: ti, check_ans: 2, pass: pass }
     }
 
     //warning check
-    if (warn_time.length != 0) {
-        t_warn = arr_warn[0];
-        t_warn = t_warn * 24 + arr_warn[1];
-        t_warn = t_warn * 60 + arr_warn[2];
-        t_warn = t_warn * 60 + arr_warn[3];
-        t_warn = t_warn * 1000 + arr_warn[4];
-        if (t_warn <= dura_t) {
-            return { in: ti, check_ans: 1, pass: pass }
-        }
+    if (warn_time.length != 0 && t_warn <= dura_t) {
+        return { in: ti, check_ans: 1, pass: pass }
     }
     return { in: ti, check_ans: 0, pass: pass }
 }
