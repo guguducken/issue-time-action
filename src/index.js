@@ -327,6 +327,9 @@ async function getLastPRCommitUpdateTime(issue) {
                 core.info(JSON.stringify(e));
             }
             if (e.node !== undefined && Object.keys(e.node).length != 0) {
+                if (e.node.source !== undefined && Object.keys(e.node.source).length != 0) {
+                    return e.node.source
+                }
                 return e.node
             }
         }
