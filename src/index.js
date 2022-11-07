@@ -91,14 +91,13 @@ async function main() {
                         updatedAt: e.created_at,
                     }
                 }
-                core.info("issue: " + e.number + " - " + e.title + " update time: " + time_update.updatedAt);
                 let check_update = await TimeCheck(time_update.updatedAt, ind_label);
                 if (!check_update.check_ans) {
                     let m = await getMessage("warning", issues[i], check_update);
                     mess_warn[ind_label].message += m;
                     mess_warn[ind_label].num++;
                     num_warn++;
-                    core.info("Warning: " + e.title + " " + check_update.pass + ">>>> Bot");
+                    core.info(">>> Warning " + num_warn + "issue: " + e.number + " - " + e.title + " update time: " + time_update.updatedAt);
                     continue;
                 }
             }
