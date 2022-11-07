@@ -79,7 +79,7 @@ async function main() {
                 core.info("cereate time: " + e.created_at);
                 let check_create = await TimeCheck(e.created_at);
                 if (check_create.check_ans == 2 && uri_error.length != 0) {
-                    // sendWeComMessage(uri_error, type_message, await getMessage("error", issues[i], check_create), "");
+                    sendWeComMessage(uri_error, type_message, await getMessage("error", issues[i], check_create), "");
                     num_error++;
                     continue;
                 }
@@ -94,7 +94,7 @@ async function main() {
                 core.info("pr or update time: " + time_update.updatedAt);
                 let check_update = await TimeCheck(time_update.updatedAt);
                 if (check_update.check_ans == 1 && uri_warn.length != 0) {
-                    // sendWeComMessage(uri_warn, type_message, await getMessage("warning", issues[i], check_update), "");
+                    sendWeComMessage(uri_warn, type_message, await getMessage("warning", issues[i], check_update), "");
                     num_warn++;
                     continue;
                 }
