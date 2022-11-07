@@ -59,11 +59,12 @@ async function main() {
             now++;
             for (let i = 0; i < issues.length; i++) {
                 const e = issues[i];
-                core.info("check issue" + e.number + ": " + e.title);
                 if (e.pull_request !== undefined || skipLabel(e) || !checkLabel(e)) { //跳过后续的检查和发送通知
-                    core.info("skip issue" + e.number + ": " + e.title + "reason: " + e.pull_request + " " + skipLabel(e) + " " + !checkLabel(e));
+                    core.info("skip PR/issue " + e.number + ": " + e.title + " <<<<<<<<");
                     continue;
                 }
+
+                core.info("check issue " + e.number + ": " + e.title + " >>>>>>>>");
                 //检查是否超过最长完成时间
                 core.info("cereate time: " + e.created_at);
                 let check_create = await TimeCheck(e.created_at);
@@ -85,6 +86,9 @@ async function main() {
 
             }
         }
+        core.info();
+        core.info("total warning: " + num_warn);
+        core.info("total expired: " + num_error);
     } catch (err) {
         core.setFailed(err.message);
     }
@@ -111,19 +115,29 @@ async function getIssues(now, num_page) {
 async function getMessage(type, issue, check) {
     let message = "";
     let assig = "";
-    for (let i = 0; i < issue.assignees.length; i++) {
-        const u = issue.assignees[i];
-        assig = u.login + "," + assig;
-    }
-    if (assig[assig.length - 1] == ',') {
-        assig = assig.substring(0, assig.length - 1);
+    if (issue.assignees.length != 0) {
+        for (let i = 0; i < issue.assignees.length; i++) {
+            const u = issue.assignees[i];
+            assig = u.login + "," + assig;
+        }
+        if (assig[assig.length - 1] == ',') {
+            assig = assig.substring(0, assig.length - 1);
+        }
     }
     switch (type) {
         case "warning":
-            message = `<font color=\"info\">[Issue Expiration Warning]</font>\n[${issue.title}](${issue.url})\nAssignees: \*\*${assig}\*\*\nRepo: ${repo.owner}/${repo.repo}\nNumber: ${issue.number}\nCreate_At: ${issue.created_at}\nPassed: ${check.pass}`
+            if (issue.assignees.length != 0) {
+                message = `<font color=\"info\">[Issue Expiration Warning]</font>\n[${issue.title}](${issue.html_url})\nAssignees: **${assig}**\nRepo: ${repo.owner}/${repo.repo}\nNumber: ${issue.number}\nCreate_At: ${issue.created_at}\nPassed: ${check.pass}`
+                break;
+            }
+            message = `<font color=\"info\">[Issue Expiration Warning]</font>\n[${issue.title}](${issue.html_url})\nAssignees: **No Assignee**\nRepo: ${repo.owner}/${repo.repo}\nNumber: ${issue.number}\nCreate_At: ${issue.created_at}\nPassed: ${check.pass}`
             break;
         case "error":
-            message = `<font color=\"warning\">[Issue Expired Warning]</font>\n[${issue.title}](${issue.url})\nAssignees: \*\*${assig}\*\*\nRepo: ${repo.owner}/${repo.repo}\nNumber: ${issue.number}\nUpdate_At: ${check.in}\nPassed: ${check.pass}`
+            if (issue.assignees.length != 0) {
+                message = `<font color=\"warning\">[Issue Expired Warning]</font>\n[${issue.title}](${issue.html_url})\nAssignees: **${assig}**\nRepo: ${repo.owner}/${repo.repo}\nNumber: ${issue.number}\nUpdate_At: ${check.in}\nPassed: ${check.pass}`
+                break;
+            }
+            message = `<font color=\"warning\">[Issue Expired Warning]</font>\n[${issue.title}](${issue.html_url})\nAssignees: **No Assignee**\nRepo: ${repo.owner}/${repo.repo}\nNumber: ${issue.number}\nUpdate_At: ${check.in}\nPassed: ${check.pass}`
             break;
         default:
             break;
