@@ -105,15 +105,15 @@ async function main() {
                         core.info(">>> Warning " + num_warn + "issue: " + e.number + " - " + e.title + " update time: " + time_update.updatedAt);
                         continue;
                     }
-                    if (mess_warn[k].num == 5) {
-                        sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
-                        mess_warn[k] = { message: ">>>>>>" + arr_label_check[k] + "<<<<<<", num: 0 };
-                    }
+                    // if (mess_warn[k].num == 5) {
+                    //     sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
+                    //     mess_warn[k] = { message: ">>>>>>" + arr_label_check[k] + "<<<<<<", num: 0 };
+                    // }
                 }
             }
-            if (mess_warn[k].num != 0) {
-                sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
-            }
+            // if (mess_warn[k].num != 0) {
+            //     sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
+            // }
         }
         core.info();
         core.info("total warning: " + num_warn);
