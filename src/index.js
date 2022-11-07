@@ -31,7 +31,7 @@ function parseMillSecond(arr) {
     let t = new Array();
     for (let i = 0; i < arr.length; i++) {
         const e = arr[i];
-        t.push(e * 86400000);
+        t.push(e * 3600000);
     }
     return t;
 }
@@ -67,7 +67,7 @@ async function main() {
 
         let mess_warn = new Array(t_warn.length);
         for (let i = 0; i < mess_warn.length; i++) {
-            mess_warn[i] = { message: ">>>>>>" + arr_label_check[i] + "<<<<<<", num: 0 };
+            mess_warn[i] = { message: "\>\>\>\>\>\>" + arr_label_check[i] + "<<<<<<", num: 0 };
         }
         for (let k = 0; k < arr_label_check.length; k++) {
             let per_page = 100;
@@ -135,10 +135,6 @@ async function getIssues(now, num_page, label) {
     );
     if (iss.length == 0) {
         return undefined;
-    }
-    for (let i = 0; i < iss.length; i++) {
-        const e = iss[i];
-        console.log(e.number);
     }
     return iss;
 }
