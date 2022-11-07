@@ -70,37 +70,39 @@ async function main() {
         for (let i = 0; i < mess_warn.length; i++) {
             mess_warn[i] = { message: ">>>>>>" + arr_label_check[i] + "<<<<<<", num: 0 };
         }
-        while (true) {
-            let issues = await getIssues(now, per_page);
-            if (issues === undefined) {
-                core.info(">>>>>>> Job finish <<<<<<<");
-                break;
-            }
-            now++;
-            for (let i = 0; i < issues.length; i++) {
-                const e = issues[i];
-                let ind_label = checkLabel(e);
-                if (e.pull_request !== undefined || skipLabel(e) || ind_label == -1) { //跳过后续的检查和发送通知
-                    // core.info("skip PR/issue " + e.number + ": " + e.title + " <<<<<<<<\n");
-                    continue;
+        for (let k = 0; k < arr_label_check.length; k++) {
+            while (true) {
+                let issues = await getIssues(now, per_page, arr_label_check[k]);
+                if (issues === undefined) {
+                    core.info(">>>>>>> Job finish <<<<<<<");
+                    break;
                 }
-                num_sum++;
-
-                //检查更新时间
-                let time_update = await getLastPRCommitUpdateTime(e);
-                if (time_update === null) {
-                    time_update = {
-                        updatedAt: e.created_at,
+                now++;
+                for (let i = 0; i < issues.length; i++) {
+                    const e = issues[i];
+                    // let ind_label = checkLabel(e);
+                    if (e.pull_request !== undefined || skipLabel(e)) { //跳过后续的检查和发送通知  || ind_label == -1
+                        // core.info("skip PR/issue " + e.number + ": " + e.title + " <<<<<<<<\n");
+                        continue;
                     }
-                }
-                let check_update = await TimeCheck(time_update.updatedAt, ind_label);
-                if (!check_update.check_ans) {
-                    let m = await getMessage("warning", issues[i], check_update);
-                    mess_warn[ind_label].message += m;
-                    mess_warn[ind_label].num++;
-                    num_warn++;
-                    core.info(">>> Warning " + num_warn + "issue: " + e.number + " - " + e.title + " update time: " + time_update.updatedAt);
-                    continue;
+                    num_sum++;
+
+                    //检查更新时间
+                    let time_update = await getLastPRCommitUpdateTime(e);
+                    if (time_update === null) {
+                        time_update = {
+                            updatedAt: e.created_at,
+                        }
+                    }
+                    let check_update = await TimeCheck(time_update.updatedAt, k);
+                    if (!check_update.check_ans) {
+                        let m = await getMessage("warning", issues[i], check_update);
+                        mess_warn[k].message += m;
+                        mess_warn[k].num++;
+                        num_warn++;
+                        core.info(">>> Warning " + num_warn + "issue: " + e.number + " - " + e.title + " update time: " + time_update.updatedAt);
+                        continue;
+                    }
                 }
             }
         }
@@ -121,13 +123,14 @@ async function main() {
 }
 
 //get issues by issue
-async function getIssues(now, num_page) {
+async function getIssues(now, num_page, label) {
     const { data: iss } = await oc.rest.issues.listForRepo(
         {
             ...repo,
             state: "open",
             sort: "created",
             direction: "desc",
+            labels: label,
             per_page: num_page,
             page: now
         }
