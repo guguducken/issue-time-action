@@ -10,14 +10,20 @@ const type_message = core.getInput('type', { required: false });
 const uri_warn = core.getInput('uri_warn', { required: false });
 const warn_time = core.getInput('warning_time', { required: false });
 const label_skip = core.getInput('label_skip', { required: false });
+const label_check = core.getInput('label_check', { required: true });
 
-const repo = github.context.repo
+// const repo = github.context.repo
+const repo = {
+    repo: "matrixone",
+    owner: "matrixorigin"
+}
 
 //get oc client
 const oc = github.getOctokit(token);
 const arr_warn = warn_time.split(" ");
 const arr_error = error_time.split(" ");
-const arr_label = label_skip.split(",");
+const arr_label_skip = label_skip.split(",");
+const arr_label_check = label_check.split(",");
 
 //get the timestamp of now
 const t_now = new Date().getTime();
@@ -50,24 +56,28 @@ async function main() {
             now++;
             for (let i = 0; i < issues.length; i++) {
                 const e = issues[i];
-                if (e.pull_request === undefined || checkLabel(e)) {
+                if (e.pull_request === undefined || skipLabel(e) || !checkLabel(e)) { //跳过后续的检查和发送通知
                     continue;
                 }
-                let ans = TimeCheck(e.created_at);
-                if (ans == 1 && uri_warn.length != 0) {
-                    sendWeComMessage(uri_warn, type_message, await getMessage("warning", issues[i]), "");
-                    num_warn++;
-                    continue;
-                }
-                if (ans == 2) {
-                    sendWeComMessage(uri_error, type_message, await getMessage("error", issues[i]), "");
+                //检查是否超过最长完成时间
+                let check_create = await TimeCheck(e.created_at);
+                if (check_create.check_ans == 2 && uri_error.length != 0) {
+                    sendWeComMessage(uri_error, type_message, await getMessage("error", issues[i], check_create), "");
                     num_error++;
+                    continue;
+                }
+
+                //检查更新时间
+                let time_update = await getLastPRCommitUpdateTime(e);
+                let check_update = await TimeCheck(time_update);
+                if (check_update.check_ans == 1 && uri_warn.length != 0) {
+                    sendWeComMessage(uri_warn, type_message, await getMessage("warning", issues[i], check_update), "");
+                    num_warn++;
                     continue;
                 }
 
             }
         }
-        core.info();
     } catch (err) {
         core.setFailed(err.message);
     }
@@ -91,7 +101,7 @@ async function getIssues(now, num_page) {
     return iss;
 }
 
-async function getMessage(type, issue) {
+async function getMessage(type, issue, check) {
     let message = "";
     let assignees = "";
     for (let i = 0; i < issue.assignees.length; i++) {
@@ -100,10 +110,10 @@ async function getMessage(type, issue) {
     }
     switch (type) {
         case "warning":
-            message = `<font color=\"info\">[Issue Expiration Warning]</font>\n[${issue.title}](${issue.url})\nAssignees: **${assignees}**\nRepo: ${repo.owner}/${repo.repo}\nNumber: ${issue.number}`
+            message = `<font color=\"info\">[Issue Expiration Warning]</font>\n[${issue.title}](${issue.url})\nAssignees: **${assignees}**\nRepo: ${repo.owner}/${repo.repo}\nNumber: ${issue.number}\nCreate_At: ${issue.created_at}\nPassed: ${check.pass}`
             break;
         case "error":
-            message = `<font color=\"warning\">[Issue Expired Warning]</font>\n[${issue.title}](${issue.url})\nAssignees: **${assignees}**\nRepo: ${repo.owner}/${repo.repo}\nNumber: ${issue.number}`
+            message = `<font color=\"warning\">[Issue Expired Warning]</font>\n[${issue.title}](${issue.url})\nAssignees: **${assignees}**\nRepo: ${repo.owner}/${repo.repo}\nNumber: ${issue.number}\nUpdate_At: ${check.in}\nPassed: ${check.pass}`
             break;
         default:
             break;
@@ -145,7 +155,7 @@ async function sendWeComMessage(uri, type, message, mentions) {
 async function TimeCheck(ti) {
     let t_in = Date.parse(ti);
     if (t_in >= t_now) {
-        return 0;
+        return { in: ti, check_ans: 0, pass: "0d-0h:0m:0s" }
     }
     let duration = t.now - t_in;
     let millisecond = duration % 1000;
@@ -162,53 +172,55 @@ async function TimeCheck(ti) {
 
     let day = duration;
 
+    let pass = `${day}d-${hour}h:${minute}m:${second}s`
+
     //error check
     if (error_time.length != 0) {
         if (day > parseInt(arr_error[0])) {
-            return 2
+            return { in: ti, check_ans: 2, pass: pass }
         }
         if (hour > parseInt(arr_error[1])) {
-            return 2
+            return { in: ti, check_ans: 2, pass: pass }
         }
         if (minute > parseInt(arr_error[2])) {
-            return 2
+            return { in: ti, check_ans: 2, pass: pass }
         }
         if (second > parseInt(arr_error[3])) {
-            return 2
+            return { in: ti, check_ans: 2, pass: pass }
         }
         if (millisecond > parseInt(arr_error[4])) {
-            return 2
+            return { in: ti, check_ans: 2, pass: pass }
         }
     }
     //warning check
     if (warn_time.length != 0) {
         if (day > parseInt(arr_warn[0])) {
-            return 1
+            return { in: ti, check_ans: 1, pass: pass }
         }
         if (hour > parseInt(arr_warn[1])) {
-            return 1
+            return { in: ti, check_ans: 1, pass: pass }
         }
         if (minute > parseInt(arr_warn[2])) {
-            return 1
+            return { in: ti, check_ans: 1, pass: pass }
         }
         if (second > parseInt(arr_warn[3])) {
-            return 1
+            return { in: ti, check_ans: 1, pass: pass }
         }
         if (millisecond > parseInt(arr_warn[4])) {
-            return 1
+            return { in: ti, check_ans: 1, pass: pass }
         }
     }
-    return 0
+    return { in: ti, check_ans: 0, pass: pass }
 }
 
-async function checkLabel(issue) {
+function skipLabel(issue) {
     if (label_skip.length == 0) {
         return false
     }
     for (let i = 0; i < issue.labels.length; i++) {
         const label = issue.labels[i];
-        for (let j = 0; j < arr_label.length; j++) {
-            const e = arr_label[j];
+        for (let j = 0; j < arr_label_skip.length; j++) {
+            const e = arr_label_skip[j];
             if (label == e) {
                 return true
             }
@@ -216,6 +228,87 @@ async function checkLabel(issue) {
     }
     return false
 
+}
+
+function checkLabel(issue) {
+    if (label_check.length == 0) {
+        return false
+    }
+    for (let i = 0; i < issue.labels.length; i++) {
+        const label = issue.labels[i];
+        for (let j = 0; j < arr_label_check.length; j++) {
+            const e = arr_label_check[j];
+            if (label == e) {
+                return true
+            }
+        }
+    }
+    return false
+}
+
+async function getLastPRCommitUpdateTime(issue) {
+    let query = `query ($repo: String!, $repo_owner: String!, $number_iss: Int!, $First: Int, $Skip: Int) {
+  repository(name: $repo, owner: $repo_owner) {
+    issue(number: $number_iss) {
+      id
+      timelineItems(first: $First, skip: $Skip) {
+        updatedAt
+        edges {
+          node {
+            ... on CrossReferencedEvent {
+              source {
+                ... on PullRequest {
+                  id
+                  updatedAt
+                  title
+                  createdAt
+                }
+              }
+            }
+            ... on IssueComment {
+              id
+              updatedAt
+              createdAt
+              body
+            }
+          }
+        }
+        pageInfo {
+          hasNextPage
+        }
+      }
+    }
+  }
+}`;
+    let hasNext = true;
+    let start = 0;
+    let per_page = 20;
+    let lastUpdate = 0;
+    let lastPR = null;
+
+    while (hasNext) {
+        let { repository } = await oc.graphql(query, {
+            "repo": repo.repo,
+            "repo_owner": repo.owner,
+            "number_iss": issue.number,
+            "First": per_page,
+            "Skip": start
+        });
+        hasNext = repository.issue.timelineItems.pageInfo.hasNextPage;
+        start += per_page;
+        let edges = repository.issue.timelineItems.edges;
+        for (let i = 0; i < edges.length; i++) {
+            const e = edges[i];
+            if (e.node !== undefined || e.node.source !== undefined || Object.keys(e.node).length != 0 || Object.keys(e.node.source).length != 0) {
+                t = Date.parse(e.node.source.updatedAt);
+                if (t > lastUpdate) {
+                    lastUpdate = t;
+                    lastPR = e.node.source;
+                }
+            }
+        }
+    }
+    return lastPR;
 }
 
 main();

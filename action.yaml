@@ -8,7 +8,7 @@ inputs:
   warning_time:
     description: "the time duration which warning people"
     required: false
-    default: ""
+    default: "3 0 0 0 0"
   error_time:
     description: "the time duration which error people"
     required: true
@@ -29,6 +29,9 @@ inputs:
     description: "this action will skip check the issue which labeled label_skip"
     required: false
     default: "none"
+  label_check:
+    description: "the label of issue which need to check"
+    required: true
 outputs:
   time: # id of output
     description: "The time we greeted you"
