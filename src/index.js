@@ -67,7 +67,7 @@ async function main() {
 
         let mess_warn = new Array(t_warn.length);
         for (let i = 0; i < mess_warn.length; i++) {
-            mess_warn[i] = { message: "\>\>\>\>\>\>" + arr_label_check[i] + "<<<<<<", num: 0 };
+            mess_warn[i] = { message: "========" + arr_label_check[i] + "========", num: 0 };
         }
         for (let k = 0; k < arr_label_check.length; k++) {
             let per_page = 100;
@@ -100,6 +100,7 @@ async function main() {
                     let check_update = await TimeCheck(time_update.updatedAt, k);
                     if (!check_update.check_ans) {
                         let m = await getMessage("warning", issues[i], check_update);
+                        mess_warn[k].message += "-----------------------------";
                         mess_warn[k].message += m;
                         mess_warn[k].num++;
                         num_warn++;
