@@ -129,7 +129,7 @@ async function main() {
             mention_message += arr_label_check[k] + " total: " + num_warn_split[k] + "\n";
         }
         sendWeComMessage(uri_warn, "text", mention_message, arr_mention);
-        core.info();
+
         core.info("total warning: " + num_warn);
         core.info("total issues: " + num_sum);
     } catch (err) {
