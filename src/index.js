@@ -332,9 +332,6 @@ async function getLastPRCommitUpdateTime(issue) {
         "Last": per_page,
     });
     let edges = repository.issue.timelineItems.edges;
-    if (issue.number == 6333) {
-        core.info(JSON.stringify(edges));
-    }
 
     while (edges.length != 0) {
         course = edges[0].cursor;
@@ -365,9 +362,6 @@ async function getLastPRCommitUpdateTime(issue) {
             "Course": course
         });
         edges = data.repository.issue.timelineItems.edges;
-        if (issue.number == 6333) {
-            core.info(JSON.stringify(edges));
-        }
     }
 
     return lastPRORCommit;
