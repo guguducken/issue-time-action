@@ -210,15 +210,15 @@ async function sendWeComMessage(uri, type, message, mentions) {
         default:
             break;
     }
-    try {
-        axios.post(uri, JSON.stringify(payload), {
-            Headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-    } catch (err) {
-        core.info(err.message);
-    }
+    // try {
+    //     axios.post(uri, JSON.stringify(payload), {
+    //         Headers: {
+    //             'Content-Type': 'application/json'
+    //         }
+    //     });
+    // } catch (err) {
+    //     core.info(err.message);
+    // }
 }
 
 //the format of t is RFC3339 and Zulu time
