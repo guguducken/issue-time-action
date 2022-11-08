@@ -339,16 +339,18 @@ async function getLastPRCommitUpdateTime(issue) {
             const e = edges[i];
             if (e.node !== undefined && Object.keys(e.node).length != 0) {
                 if (e.node.source !== undefined && Object.keys(e.node.source).length != 0) {
-                    // if (Date.parse(e.node.source.updatedAt) > time_last) {
-                    //     lastPRORCommit = e.node.source
-                    // }
-                    return e.node.source
+                    if (Date.parse(e.node.source.updatedAt) > time_last) {
+                        lastPRORCommit = e.node.source
+                        time_last = Date.parse(e.node.source.updatedAt)
+                    }
+                    // return e.node.source
                 }
                 if (e.node.updatedAt !== undefined) {
-                    // if (Date.parse(e.node.updatedAt) > time_last) {
-                    //     lastPRORCommit = e.node
-                    // }
-                    return e.node
+                    if (Date.parse(e.node.updatedAt) > time_last) {
+                        lastPRORCommit = e.node
+                        time_last = Date.parse(e.node.updatedAt)
+                    }
+                    // return e.node
                 }
             }
         }
