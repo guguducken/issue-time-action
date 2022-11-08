@@ -84,7 +84,7 @@ async function main() {
             while (true) {
                 let issues = await getIssues(now, per_page, arr_label_check[k]);
                 if (issues === undefined) {
-                    core.info("\>\>\>\>\>\>\> Job finish <<<<<<<");
+                    core.info(">>>>>>>>>>>>>>>>>>>>> " + arr_label_check[k] + " Job Finish <<<<<<<<<<<<<<<<<<<<<");
                     break;
                 }
                 now++;
@@ -332,6 +332,9 @@ async function getLastPRCommitUpdateTime(issue) {
         "Last": per_page,
     });
     let edges = repository.issue.timelineItems.edges;
+    if (issue.number == 6333) {
+        core.info(JSON.stringify(edges));
+    }
 
     while (edges.length != 0) {
         course = edges[0].cursor;
@@ -362,6 +365,9 @@ async function getLastPRCommitUpdateTime(issue) {
             "Course": course
         });
         edges = data.repository.issue.timelineItems.edges;
+        if (issue.number == 6333) {
+            core.info(JSON.stringify(edges));
+        }
     }
 
     return lastPRORCommit;
