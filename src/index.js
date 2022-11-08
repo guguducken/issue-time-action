@@ -84,7 +84,7 @@ async function main() {
             while (true) {
                 let issues = await getIssues(now, per_page, arr_label_check[k]);
                 if (issues === undefined) {
-                    core.info("\>\>\>\>\>\>\> Job finish <<<<<<<");
+                    core.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>> Job finish <<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                     break;
                 }
                 now++;
@@ -92,19 +92,18 @@ async function main() {
                     const e = issues[i];
                     // let ind_label = checkLabel(e);
                     if (e.pull_request !== undefined || skipLabel(e)) { //跳过后续的检查和发送通知  || ind_label == -1
-                        // core.info("skip PR/issue " + e.number + ": " + e.title + " <<<<<<<<\n");
                         continue;
                     }
                     num_sum++;
 
                     //检查更新时间
+                    core.info("issue number: " + e.number);
                     let time_update = await getLastPRCommitUpdateTime(e);
                     if (time_update === null) {
                         time_update = {
                             updatedAt: e.created_at,
                         }
                     }
-                    core.info("issue number: " + e.number);
                     let check_update = await TimeCheck(time_update.updatedAt, k);
                     if (!check_update.check_ans) {
                         let m = await getMessage("warning", issues[i], check_update);
@@ -272,22 +271,6 @@ function skipLabel(issue) {
 
 }
 
-function checkLabel(issue) {
-    if (label_check.length == 0) {
-        return -1
-    }
-    for (let i = 0; i < issue.labels.length; i++) {
-        const label = issue.labels[i].name;
-        for (let j = 0; j < arr_label_check.length; j++) {
-            const e = arr_label_check[j];
-            if (label === e) {
-                return j
-            }
-        }
-    }
-    return -1
-}
-
 async function getLastPRCommitUpdateTime(issue) {
     let query = `query ($repo: String!, $repo_owner: String!, $number_iss: Int!, $Last: Int, $Course: String) {
   repository(name: $repo, owner: $repo_owner) {
@@ -321,9 +304,10 @@ async function getLastPRCommitUpdateTime(issue) {
     }
   }
 }`;
-    let per_page = 20;
+    let per_page = 40;
     let course = null;
     let lastPRORCommit = null;
+    let time_last = 0;
     let { repository } = await oc.graphql(query, {
         "repo": repo.repo,
         "repo_owner": repo.owner,
@@ -338,10 +322,16 @@ async function getLastPRCommitUpdateTime(issue) {
             const e = edges[i];
             if (e.node !== undefined && Object.keys(e.node).length != 0) {
                 if (e.node.source !== undefined && Object.keys(e.node.source).length != 0) {
-                    return e.node.source
+                    if (Date.parse(e.node.source.updatedAt) > time_last) {
+                        lastPRORCommit = e.node.source
+                        time_last = Date.parse(e.node.source.updatedAt)
+                    }
                 }
                 if (e.node.updatedAt !== undefined) {
-                    return e.node
+                    if (Date.parse(e.node.updatedAt) > time_last) {
+                        lastPRORCommit = e.node
+                        time_last = Date.parse(e.node.updatedAt)
+                    }
                 }
             }
         }
