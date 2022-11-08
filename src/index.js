@@ -211,15 +211,15 @@ async function sendWeComMessage(uri, type, message, mentions) {
         default:
             break;
     }
-    try {
-        axios.post(uri, JSON.stringify(payload), {
-            Headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-    } catch (err) {
-        core.info(err.message);
-    }
+    // try {
+    //     axios.post(uri, JSON.stringify(payload), {
+    //         Headers: {
+    //             'Content-Type': 'application/json'
+    //         }
+    //     });
+    // } catch (err) {
+    //     core.info(err.message);
+    // }
 }
 
 //the format of t is RFC3339 and Zulu time
@@ -321,9 +321,10 @@ async function getLastPRCommitUpdateTime(issue) {
     }
   }
 }`;
-    let per_page = 20;
+    let per_page = 40;
     let course = null;
     let lastPRORCommit = null;
+    let time_last = 0;
     let { repository } = await oc.graphql(query, {
         "repo": repo.repo,
         "repo_owner": repo.owner,
@@ -338,10 +339,16 @@ async function getLastPRCommitUpdateTime(issue) {
             const e = edges[i];
             if (e.node !== undefined && Object.keys(e.node).length != 0) {
                 if (e.node.source !== undefined && Object.keys(e.node.source).length != 0) {
-                    return e.node.source
+                    if (Date.parse(e.node.source.updatedAt) > time_last) {
+                        lastPRORCommit = e.node.source
+                    }
+                    // return e.node.source
                 }
                 if (e.node.updatedAt !== undefined) {
-                    return e.node
+                    if (Date.parse(e.node.updatedAt) > time_last) {
+                        lastPRORCommit = e.node
+                    }
+                    // return e.node
                 }
             }
         }
