@@ -12,6 +12,8 @@ const label_check = core.getInput('label_check', { required: true });
 const label_skip = core.getInput('label_skip', { required: false });
 const type_message = core.getInput('type', { required: false });
 const mentions_l = core.getInput('mentions', { required: false });
+const cor = JSON.parse(core.getInput('corresponding', { required: true }));
+
 
 // const repo = github.context.repo
 const repo = {
@@ -71,10 +73,10 @@ async function main() {
         //coding
         let mention_message = "";
 
-        let mess_warn = new Array(t_warn.length);
+        let mess_warn = {};
         let num_warn_split = new Array(t_warn.length);
         for (let i = 0; i < mess_warn.length; i++) {
-            mess_warn[i] = { message: "**<font color=\"warning\">" + arr_label_check[i] + " Status Update Wanted !!!</font>**\n", num: 0 };
+            // mess_warn[i] = { message: "**<font color=\"warning\">" + arr_label_check[i] + " Status Update Wanted !!!</font>**\n", num: 0 };
             num_warn_split[i] = 0;
         }
         for (let k = 0; k < arr_label_check.length; k++) {
@@ -90,8 +92,7 @@ async function main() {
                 now++;
                 for (let i = 0; i < issues.length; i++) {
                     const e = issues[i];
-                    // let ind_label = checkLabel(e);
-                    if (e.pull_request !== undefined || skipLabel(e)) { //跳过后续的检查和发送通知  || ind_label == -1
+                    if (e.pull_request !== undefined || skipLabel(e)) { //跳过后续的检查和发送通知
                         continue;
                     }
                     num_sum++;
@@ -107,24 +108,20 @@ async function main() {
                     let check_update = await TimeCheck(time_update.updatedAt, k);
                     if (!check_update.check_ans) {
                         let m = await getMessage("warning", issues[i], check_update);
+                        if (mess_warn[e.assignee.login] === undefined) {
+                            //初始化对象，设置login和对应的不同label的初始message
+                            mess_warn[e.assignee.login] = userInit(e.assignee.login)
+                        }
                         mess_warn[k].message += "-------------------------------------\n";
                         mess_warn[k].message += m;
-                        mess_warn[k].num++;
+
+                        //统计每一个label对应的issue的个数
                         num_warn_split[k]++;
+                        //统计总的warning的数量
                         num_warn++;
                         core.info(">>> Warning " + num_warn + " issue: " + e.number + " - " + e.title + " update time: " + time_update.updatedAt);
                     }
-                    if (mess_warn[k].num >= min) {
-                        mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
-                        await sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
-                        mess_warn[k].message = "**<font color=\"warning\">" + arr_label_check[k] + " Status Update Wanted !!!</font>**\n";
-                        mess_warn[k].num = 0;
-                    }
                 }
-            }
-            if (mess_warn[k].num > 0) {
-                mess_warn[k].message += "-------------------------------------\n**Total: " + mess_warn[k].num + "**";
-                await sendWeComMessage(uri_warn, type_message, mess_warn[k].message, "");
             }
             mention_message += arr_label_check[k] + " total: " + num_warn_split[k] + "\n";
         }
@@ -135,6 +132,19 @@ async function main() {
     } catch (err) {
         core.setFailed(err.message);
     }
+}
+
+//init user object
+function userInit(login) {
+    let u = {
+        weCom: cor[login],
+        messages: {}
+    };
+    for (let j = 0; j < arr_label_check.length; j++) {
+        const l = arr_label_check[j];
+        u[messages][l] = "**<font color=\"warning\">" + arr_label_check[j] + " Status Update Wanted !!!</font>**\n";
+    }
+    return u;
 }
 
 //get issues by issue
@@ -158,31 +168,23 @@ async function getIssues(now, num_page, label) {
 
 async function getMessage(type, issue, check) {
     let message = "";
-    let assig = "";
-    if (issue.assignees.length != 0) {
-        for (let i = 0; i < issue.assignees.length; i++) {
-            const u = issue.assignees[i];
-            assig = "[" + u.login + "](" + u.html_url + ")" + "," + assig;
-        }
-        if (assig[assig.length - 1] == ',') {
-            assig = assig.substring(0, assig.length - 1);
-        }
-    }
+    // let assig = "";
+    // if (issue.assignees.length != 0) {
+    //     for (let i = 0; i < issue.assignees.length; i++) {
+    //         const u = issue.assignees[i];
+    //         assig = "<" + cor[u.login] + ">" + "," + assig;
+    //     }
+    //     if (assig[assig.length - 1] == ',') {
+    //         assig = assig.substring(0, assig.length - 1);
+    //     }
+    // }
 
     switch (type) {
         case "warning":
-            if (issue.assignees.length != 0) {
-                message = `[${issue.title}](${issue.html_url})\nAssignees: **${assig}**\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
-                break;
-            }
-            message = `[${issue.title}](${issue.html_url})\nAssignees: **No Assignee**\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
+            message = `[${issue.title}](${issue.html_url})\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
             break;
         case "error":
-            if (issue.assignees.length != 0) {
-                message = `[${issue.title}](${issue.html_url})\nAssignees: **${assig}**\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
-                break;
-            }
-            message = `[${issue.title}](${issue.html_url})\nAssignees: **No Assignee**\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
+            message = `[${issue.title}](${issue.html_url})\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
             break;
         default:
             break;
@@ -245,12 +247,11 @@ async function TimeCheck(ti, ind) {
 
     let pass = `${day}d-${hour}h:${minute}m:${second}s`
 
+    core.info("in TimeCheck: " + ti + " >> " + pass + " >> dura_t: " + dura_t);
     if (dura_t > t_warn[ind]) {
-        core.info("in TimeCheck: " + ti + " >> " + pass + " >> dura_t: " + dura_t);
         return { in: ti, check_ans: false, pass: pass }
     }
 
-    core.info("in TimeCheck: " + ti + " >> " + pass + " >> dura_t: " + dura_t);
     return { in: ti, check_ans: true, pass: pass }
 }
 

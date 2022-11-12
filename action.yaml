@@ -31,6 +31,9 @@ inputs:
   mentions:
     description: "mention list"
     required: false
+  corresponding: 
+    description: "the corresponding for github to wechat"
+    required: true
 runs:
   using: "node16"
   main: "src/index.js"
