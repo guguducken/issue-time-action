@@ -112,8 +112,8 @@ async function main() {
                             //初始化对象，设置login和对应的不同label的初始message
                             mess_warn[e.assignee.login] = userInit(e.assignee.login)
                         }
-                        mess_warn[k].message += "-------------------------------------\n";
-                        mess_warn[k].message += m;
+                        mess_warn[e.assignee.login][messages][arr_label_check[k]] += m;
+                        mess_warn[e.assignee.login][total]++;
 
                         //统计每一个label对应的issue的个数
                         num_warn_split[k]++;
@@ -125,6 +125,15 @@ async function main() {
             }
             mention_message += arr_label_check[k] + " total: " + num_warn_split[k] + "\n";
         }
+        //send message which group by assignee
+        for (const key in mess_warn) {
+            let u = mess_warn[key];
+            let m = "";
+            for (const key in u.messages) {
+                m += u.messages[key];
+            }
+            sendWeComMessage(uri_warn, type_message, assignAndTotal(m, u.total, u.weCom));
+        }
         sendWeComMessage(uri_warn, "text", mention_message, arr_mention);
 
         core.info("total warning: " + num_warn);
@@ -134,15 +143,20 @@ async function main() {
     }
 }
 
+function assignAndTotal(message, total, assign) {
+    message += `-------------------------------------\nTotal: ${total}\nAssignee: <@${assign}>`;
+}
+
 //init user object
 function userInit(login) {
     let u = {
         weCom: cor[login],
+        total: 0,
         messages: {}
     };
     for (let j = 0; j < arr_label_check.length; j++) {
         const l = arr_label_check[j];
-        u[messages][l] = "**<font color=\"warning\">" + arr_label_check[j] + " Status Update Wanted !!!</font>**\n";
+        u[messages][l] = "**<font color=\"warning\">" + arr_label_check[j] + "</font>**\n";
     }
     return u;
 }
@@ -181,10 +195,10 @@ async function getMessage(type, issue, check) {
 
     switch (type) {
         case "warning":
-            message = `[${issue.title}](${issue.html_url})\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
+            message = `-------------------------------------\n[${issue.title}](${issue.html_url})\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
             break;
         case "error":
-            message = `[${issue.title}](${issue.html_url})\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
+            message = `-------------------------------------\n[${issue.title}](${issue.html_url})\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
             break;
         default:
             break;
