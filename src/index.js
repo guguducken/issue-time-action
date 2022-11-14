@@ -20,7 +20,6 @@ const repo = {
     repo: repo_name,
     owner: repo_owner
 }
-const min = 10;
 
 
 //get oc client
@@ -31,7 +30,9 @@ const arr_warn_time = warn_time.split(" ");
 const arr_mention = mentions_l.split(",");
 
 //get the timestamp of now
-const t_now = new Date().getTime();
+const t_rf = new Date();
+const t_now = t_rf.getTime();
+const day_one = 86400000; //ms
 let t_warn = parseMillSecond(parseArray(arr_warn_time));
 
 function parseMillSecond(arr) {
@@ -243,23 +244,13 @@ async function TimeCheck(ti, ind) {
     if (t_in >= t_now) {
         return { in: ti, check_ans: true, pass: "0d-0h:0m:0s" }
     }
-    let duration = t_now - t_in;
-    let dura_t = t_now - t_in;
-    let millisecond = duration % 1000;
-    duration = parseInt(duration / 1000);
+    // let duration = t_now - t_in;
+    // let dura_t = t_now - t_in;
 
-    let second = duration % 60;
-    duration = parseInt(duration / 60);
+    let pa = getDays(t_in, t_now);
 
-    let minute = duration % 60;
-    duration = parseInt(duration / 60);
 
-    let hour = duration % 24;
-    duration = parseInt(duration / 24);
-
-    let day = duration;
-
-    let pass = `${day}d-${hour}h:${minute}m:${second}s`
+    let pass = `${days}d-${hours}h:${minutes}m:${seconds}s`
 
     core.info("in TimeCheck: " + ti + " >> " + pass + " >> dura_t: " + dura_t);
     if (dura_t > t_warn[ind]) {
@@ -267,6 +258,103 @@ async function TimeCheck(ti, ind) {
     }
 
     return { in: ti, check_ans: true, pass: pass }
+}
+
+class time_pass {
+    constructor(days, hours, minutes, seconds, milliseconds, holiday, mile_total) {
+        this.days = days;
+        this.hours = hours;
+        this.minutes = minutes;
+        this.seconds = seconds;
+        this.milliseconds = milliseconds;
+        this.mile_total = mile_total;
+    }
+}
+
+function getPass(duration) {
+    let milliseconds = duration % 1000;
+    duration = parseInt(duration / 1000);
+    let seconds = duration % 60;
+    duration = parseInt(duration / 60);
+    let minutes = duration % 60;
+    duration = parseInt(duration / 60);
+    let hours = duration % 24;
+    duration = parseInt(duration / 24);
+    let days = duration;
+    return new time_pass(days, hours, minutes, seconds, milliseconds, duration);
+}
+
+function toMillSeconds(days, hours, minutes, seconds, milliseconds) {
+    let sum_mill = days * 24;
+    sum_mill = (sum_mill + hours) * 60;
+    sum_mill = (sum_mill + minutes) * 60;
+    sum_mill = (sum_mill + seconds) * 1000;
+    return sum_mill + milliseconds;
+}
+
+function getDays(start, end) {
+    let t_1 = getPass(Date.parse(end) - Date.parse(start));
+    let mil_start = start.getTime();
+    let mil_end = end.getTime();
+
+    let holiday = 0;
+    let work = 0;
+
+    let weeks = parseInt(t_1.days / 7);
+    if (weeks >= 1) {
+        holiday += weeks * 2 * day_one;
+        work += weeks * 5 * day_one;
+    }
+    let day_start = start.getDay();
+    day_start = day_start == 0 ? 7 : day_start;
+    let day_end = end.getDay();
+    day_end = day_end == 0 ? 7 : day_end;
+
+    let dura_start_one = (day_start - 1) * day_one + (mil_start - (new Date(start.getFullYear(), start.getMonth(), start.getDate(), 0, 0, 0, 0).getTime()))
+    let dura_end_one = (day_end - 1) * day_one + (mil_end - (new Date(end.getFullYear(), end.getMonth(), end.getDate(), 0, 0, 0, 0).getTime()))
+    if (dura_end_one > dura_start_one) {
+        if (day_end >= 6) {
+            if (day_start >= 6) {
+                holiday += dura_end_one - dura_start_one;
+            } else {
+                let dura_end_six = (day_end - 6) * day_one + (mil_end - (new Date(end.getFullYear(), end.getMonth(), end.getDate(), 0, 0, 0, 0).getTime()))
+                holiday += dura_end_six;
+                work += 5 * day_one - dura_start_one;
+            }
+        } else {
+            work += dura_end_one - dura_start_one;
+        }
+    } else {
+        let work_start = 5 * day_one - dura_start_one;
+        if (work_start >= 0) {
+            work += work_start;
+            dura_start_one = 5 * day_one;
+        }
+        let holid_start = 7 * day_one - dura_start_one;
+        holiday += holid_start;
+
+        let holid_end = dura_end_one - 6 * day_one;
+        if (holid_end >= 0) {
+            holiday += holid_end;
+            dura_end_one = 6 * day_one;
+        }
+        work += dura_end_one;
+    }
+    return { work: getPass(work), holiday: getPass(holiday) }
+}
+
+function Since(start, end) {
+    let t_start = start.pasrse();
+    let t_end = end.parse();
+    return new Date(t_end - t_start);
+}
+
+function getMonthDays(year, month) {
+    month++;
+    var stratDate = new Date(year, month - 1, 1),
+        endData = new Date(year, month, 1);
+    var days = (endData - stratDate) / (1000 * 60 * 60 * 24);
+    return days;
 }
 
 function skipLabel(issue) {
