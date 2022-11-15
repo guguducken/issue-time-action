@@ -161,8 +161,10 @@ function userInit(login) {
     };
     for (let j = 0; j < arr_label_check.length; j++) {
         const l = arr_label_check[j];
-        u["messages"][l]["body"] = "**<font color=\"warning\">" + arr_label_check[j] + "</font>**\n";
-        u["messages"][l]["num"] = 0;
+        u["messages"][l] = {
+            body: "**<font color=\"warning\">" + arr_label_check[j] + "</font>**\n",
+            num: 0
+        }
     }
     return u;
 }
