@@ -10,6 +10,7 @@ const repo_owner = core.getInput('repo_owner', { required: true });
 const warn_time = core.getInput('warning_time', { required: true });
 const label_check = core.getInput('label_check', { required: true });
 const label_skip = core.getInput('label_skip', { required: false });
+const milestones = core.getInput('milestones', { required: false });
 const type_message = core.getInput('type', { required: false });
 const mentions_l = core.getInput('mentions', { required: false });
 const cor = JSON.parse(core.getInput('corresponding', { required: true }));
@@ -28,6 +29,7 @@ const arr_label_skip = label_skip.split(",");
 const arr_label_check = label_check.split(",");
 const arr_warn_time = warn_time.split(" ");
 const arr_mention = mentions_l.split(",");
+const arr_milestone = milestones.split(" ");
 
 //get the timestamp of now
 const t_rf = new Date();
@@ -92,7 +94,7 @@ async function main() {
                 now++;
                 for (let i = 0; i < issues.length; i++) {
                     const e = issues[i];
-                    if (e.pull_request !== undefined || skipLabel(e)) { //跳过后续的检查和发送通知
+                    if (e.pull_request !== undefined || skipLabel(e) || !checkMilestone(e)) { //跳过后续的检查和发送通知
                         continue;
                     }
                     num_sum++;
@@ -188,6 +190,19 @@ async function getIssues(now, num_page, label) {
     return iss;
 }
 
+function checkMilestone(issue) {
+    if (milestones.length == 0) {
+        return false
+    }
+    for (let i = 0; i < arr_milestone.length; i++) {
+        const m = arr_milestone[i];
+        if (issue.milestone.title == m) {
+            return true
+        }
+    }
+    return false
+}
+
 async function getMessage(type, issue, check) {
     let message = "";
 
@@ -236,7 +251,7 @@ async function sendWeComMessage(uri, type, message, mentions) {
     // }
 }
 
-//the format of t is RFC3339 and Zulu time
+//the format of t is object Date
 async function TimeCheck(ti, ind) {
     let t_in = Date.parse(ti);
     if (t_in >= t_now) {
@@ -277,14 +292,6 @@ function getPass(duration) {
     duration = parseInt(duration / 24);
     let days = duration;
     return new time_pass(days, hours, minutes, seconds, milliseconds, t, `${days}d-${hours}h:${minutes}m:${seconds}s`);
-}
-
-function toMillSeconds(days, hours, minutes, seconds, milliseconds) {
-    let sum_mill = days * 24;
-    sum_mill = (sum_mill + hours) * 60;
-    sum_mill = (sum_mill + minutes) * 60;
-    sum_mill = (sum_mill + seconds) * 1000;
-    return sum_mill + milliseconds;
 }
 
 function getDays(start, end) {
