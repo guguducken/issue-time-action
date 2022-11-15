@@ -76,8 +76,7 @@ async function main() {
 
         let mess_warn = {};
         let num_warn_split = new Array(t_warn.length);
-        for (let i = 0; i < mess_warn.length; i++) {
-            // mess_warn[i] = { message: "**<font color=\"warning\">" + arr_label_check[i] + " Status Update Wanted !!!</font>**\n", num: 0 };
+        for (let i = 0; i < arr_label_check.length; i++) {
             num_warn_split[i] = 0;
         }
         for (let k = 0; k < arr_label_check.length; k++) {
@@ -113,8 +112,9 @@ async function main() {
                             //初始化对象，设置login和对应的不同label的初始message
                             mess_warn[e.assignee.login] = userInit(e.assignee.login)
                         }
-                        core.info(JSON.stringify(mess_warn[e.assignee.login]));
-                        mess_warn[e.assignee.login]["messages"][arr_label_check[k]] += m;
+                        mess_warn[e.assignee.login]["messages"][arr_label_check[k]]["body"] += m;
+                        mess_warn[e.assignee.login]["messages"][arr_label_check[k]]["num"]++;
+
                         mess_warn[e.assignee.login]["total"]++;
 
                         //统计每一个label对应的issue的个数
@@ -132,7 +132,9 @@ async function main() {
             let u = mess_warn[key];
             let m = "";
             for (const key in u.messages) {
-                m += u.messages[key];
+                if (u.messages[key]["num"] > 0) {
+                    m += u.messages[key]["body"];
+                }
             }
             sendWeComMessage(uri_warn, type_message, assignAndTotal(m, u.total, u.weCom));
         }
@@ -159,7 +161,8 @@ function userInit(login) {
     };
     for (let j = 0; j < arr_label_check.length; j++) {
         const l = arr_label_check[j];
-        u["messages"][l] = "**<font color=\"warning\">" + arr_label_check[j] + "</font>**\n";
+        u["messages"][l]["body"] = "**<font color=\"warning\">" + arr_label_check[j] + "</font>**\n";
+        u["messages"][l]["num"] = 0;
     }
     return u;
 }
@@ -219,6 +222,7 @@ async function sendWeComMessage(uri, type, message, mentions) {
         default:
             break;
     }
+    core.info(JSON.stringify(payload));
     // try {
     //     axios.post(uri, JSON.stringify(payload), {
     //         Headers: {
