@@ -3,11 +3,10 @@ function getDays(start, end) {
     let t_1 = getPass(Date.parse(end) - Date.parse(start));
     let mil_start = start.getTime();
     let mil_end = end.getTime();
-    console.log(t_1)
 
     let holiday = 0;
     let work = 0;
-    //完整的有几周
+
     let weeks = parseInt(t_1.days / 7);
     if (weeks >= 1) {
         holiday += weeks * 2 * day_one;
@@ -52,7 +51,7 @@ function getDays(start, end) {
 }
 
 class time_pass {
-    constructor(days, hours, minutes, seconds, milliseconds, holiday, mile_total) {
+    constructor(days, hours, minutes, seconds, milliseconds, mile_total) {
         this.days = days;
         this.hours = hours;
         this.minutes = minutes;
@@ -63,6 +62,7 @@ class time_pass {
 }
 
 function getPass(duration) {
+    let t = duration;
     let milliseconds = duration % 1000;
     duration = parseInt(duration / 1000);
     let seconds = duration % 60;
@@ -72,14 +72,14 @@ function getPass(duration) {
     let hours = duration % 24;
     duration = parseInt(duration / 24);
     let days = duration;
-    return new time_pass(days, hours, minutes, seconds, milliseconds, duration);
+    return new time_pass(days, hours, minutes, seconds, milliseconds, t);
 }
 
 function main() {
     let start = new Date(2022, 10, 5, 6, 0, 0, 0);
     console.log(start)
-    // let now = new Date(2022, 11, 14, 0, 0, 0, 0);
-    let now = new Date();
+    let now = new Date(2022, 10, 6, 0, 0, 0, 0);
+    // let now = new Date();
     console.log(now);
     let { work, holiday } = getDays(start, now);
     console.log(JSON.stringify(work));

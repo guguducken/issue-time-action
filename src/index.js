@@ -183,23 +183,13 @@ async function getIssues(now, num_page, label) {
 
 async function getMessage(type, issue, check) {
     let message = "";
-    // let assig = "";
-    // if (issue.assignees.length != 0) {
-    //     for (let i = 0; i < issue.assignees.length; i++) {
-    //         const u = issue.assignees[i];
-    //         assig = "<" + cor[u.login] + ">" + "," + assig;
-    //     }
-    //     if (assig[assig.length - 1] == ',') {
-    //         assig = assig.substring(0, assig.length - 1);
-    //     }
-    // }
 
     switch (type) {
         case "warning":
-            message = `-------------------------------------\n[${issue.title}](${issue.html_url})\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
+            message = `-------------------------------------\n[${issue.title}](${issue.html_url})\nUpdateAt: ${check.in}\nWorked: ${check.pass.work.pass}\nHolidays: ${check.pass.holiday.pass}\n`;
             break;
         case "error":
-            message = `-------------------------------------\n[${issue.title}](${issue.html_url})\nUpdateAt: ${check.in}\nPassed: ${check.pass}\n`
+            message = `-------------------------------------\n[${issue.title}](${issue.html_url})\nUpdateAt: ${check.in}\nWorked: ${check.pass.work.pass}\nHolidays: ${check.pass.holiday.pass}\n`;
             break;
         default:
             break;
@@ -242,36 +232,33 @@ async function sendWeComMessage(uri, type, message, mentions) {
 async function TimeCheck(ti, ind) {
     let t_in = Date.parse(ti);
     if (t_in >= t_now) {
-        return { in: ti, check_ans: true, pass: "0d-0h:0m:0s" }
-    }
-    // let duration = t_now - t_in;
-    // let dura_t = t_now - t_in;
-
-    let pa = getDays(t_in, t_now);
-
-
-    let pass = `${days}d-${hours}h:${minutes}m:${seconds}s`
-
-    core.info("in TimeCheck: " + ti + " >> " + pass + " >> dura_t: " + dura_t);
-    if (dura_t > t_warn[ind]) {
-        return { in: ti, check_ans: false, pass: pass }
+        return { in: ti, check_ans: true, pass: undefined }
     }
 
-    return { in: ti, check_ans: true, pass: pass }
+    let { work, holiday } = getDays(ti, t_rf);
+
+    core.info(`Pass: work--> ${work.pass} == ${work.mile_total}ms || holiday--> ${holiday.pass} == ${holiday.mile_total}ms`);
+    if (work.mile_total > t_warn[ind]) {
+        return { in: ti, check_ans: false, pass: { work, holiday } }
+    }
+
+    return { in: ti, check_ans: true, pass: { work, holiday } }
 }
 
 class time_pass {
-    constructor(days, hours, minutes, seconds, milliseconds, holiday, mile_total) {
+    constructor(days, hours, minutes, seconds, milliseconds, mile_total, pass) {
         this.days = days;
         this.hours = hours;
         this.minutes = minutes;
         this.seconds = seconds;
         this.milliseconds = milliseconds;
         this.mile_total = mile_total;
+        this.pass = pass;
     }
 }
 
 function getPass(duration) {
+    let t = duration;
     let milliseconds = duration % 1000;
     duration = parseInt(duration / 1000);
     let seconds = duration % 60;
@@ -281,7 +268,7 @@ function getPass(duration) {
     let hours = duration % 24;
     duration = parseInt(duration / 24);
     let days = duration;
-    return new time_pass(days, hours, minutes, seconds, milliseconds, duration);
+    return new time_pass(days, hours, minutes, seconds, milliseconds, t, `${days}d-${hours}h:${minutes}m:${seconds}s`);
 }
 
 function toMillSeconds(days, hours, minutes, seconds, milliseconds) {
@@ -341,20 +328,6 @@ function getDays(start, end) {
         work += dura_end_one;
     }
     return { work: getPass(work), holiday: getPass(holiday) }
-}
-
-function Since(start, end) {
-    let t_start = start.pasrse();
-    let t_end = end.parse();
-    return new Date(t_end - t_start);
-}
-
-function getMonthDays(year, month) {
-    month++;
-    var stratDate = new Date(year, month - 1, 1),
-        endData = new Date(year, month, 1);
-    var days = (endData - stratDate) / (1000 * 60 * 60 * 24);
-    return days;
 }
 
 function skipLabel(issue) {
