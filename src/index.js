@@ -194,6 +194,7 @@ function checkMilestone(issue) {
     if (milestones.length == 0) {
         return true
     }
+    core.info(JSON.stringify(issue));
     for (let i = 0; i < arr_milestone.length; i++) {
         const m = arr_milestone[i];
         if (issue.milestone.title == m) {
