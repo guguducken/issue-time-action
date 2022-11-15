@@ -113,6 +113,7 @@ async function main() {
                             //初始化对象，设置login和对应的不同label的初始message
                             mess_warn[e.assignee.login] = userInit(e.assignee.login)
                         }
+                        core.info(JSON.stringify(mess_warn[e.assignee.login]));
                         mess_warn[e.assignee.login][messages][arr_label_check[k]] += m;
                         mess_warn[e.assignee.login][total]++;
 
