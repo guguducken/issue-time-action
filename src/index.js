@@ -94,7 +94,7 @@ async function main() {
                 now++;
                 for (let i = 0; i < issues.length; i++) {
                     const e = issues[i];
-                    if (e.pull_request !== undefined || skipLabel(e) || !checkMilestone(e) || cor[e.login] === undefined) { //跳过后续的检查和发送通知
+                    if (e.pull_request !== undefined || skipLabel(e) || !checkMilestone(e) || !cor.hasOwnProperty(e.login)) { //跳过后续的检查和发送通知
                         continue;
                     }
                     num_sum++;
@@ -242,16 +242,15 @@ async function sendWeComMessage(uri, type, message, mentions) {
         default:
             break;
     }
-    core.info(JSON.stringify(payload));
-    try {
-        axios.post(uri, JSON.stringify(payload), {
-            Headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-    } catch (err) {
-        core.info(err.message);
-    }
+    // try {
+    //     axios.post(uri, JSON.stringify(payload), {
+    //         Headers: {
+    //             'Content-Type': 'application/json'
+    //         }
+    //     });
+    // } catch (err) {
+    //     core.info(err.message);
+    // }
 }
 
 //the format of t is object Date
