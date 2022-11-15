@@ -146,6 +146,7 @@ async function main() {
 
 function assignAndTotal(message, total, assign) {
     message += `-------------------------------------\nTotal: ${total}\nAssignee: <@${assign}>`;
+    return message
 }
 
 //init user object
@@ -235,7 +236,7 @@ async function TimeCheck(ti, ind) {
         return { in: ti, check_ans: true, pass: undefined }
     }
 
-    let { work, holiday } = getDays(ti, t_rf);
+    let { work, holiday } = getDays(new Date(ti), t_rf);
 
     core.info(`Pass: work--> ${work.pass} == ${work.mile_total}ms || holiday--> ${holiday.pass} == ${holiday.mile_total}ms`);
     if (work.mile_total > t_warn[ind]) {
