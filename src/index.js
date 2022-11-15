@@ -211,10 +211,10 @@ async function getMessage(type, issue, check) {
 
     switch (type) {
         case "warning":
-            message = `-------------------------------------\n[${issue.title}](${issue.html_url})\nUpdateAt: ${check.in}\nWorked: ${check.pass.work.pass}\nHolidays: ${check.pass.holiday.pass}\n`;
+            message = `-------------------------------------\n[${issue.title}](${issue.html_url})\nUpdateAt: ${check.in}\nWorked: ${check.pass.work.pass}\n`;
             break;
         case "error":
-            message = `-------------------------------------\n[${issue.title}](${issue.html_url})\nUpdateAt: ${check.in}\nWorked: ${check.pass.work.pass}\nHolidays: ${check.pass.holiday.pass}\n`;
+            message = `-------------------------------------\n[${issue.title}](${issue.html_url})\nUpdateAt: ${check.in}\nWorked: ${check.pass.work.pass}\n`;
             break;
         default:
             break;
