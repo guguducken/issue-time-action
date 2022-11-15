@@ -114,8 +114,8 @@ async function main() {
                             mess_warn[e.assignee.login] = userInit(e.assignee.login)
                         }
                         core.info(JSON.stringify(mess_warn[e.assignee.login]));
-                        mess_warn[e.assignee.login][messages][arr_label_check[k]] += m;
-                        mess_warn[e.assignee.login][total]++;
+                        mess_warn[e.assignee.login]["messages"][arr_label_check[k]] += m;
+                        mess_warn[e.assignee.login]["total"]++;
 
                         //统计每一个label对应的issue的个数
                         num_warn_split[k]++;
@@ -155,11 +155,11 @@ function userInit(login) {
     let u = {
         weCom: cor[login],
         total: 0,
-        messages: Object.create(null)
+        messages: {}
     };
     for (let j = 0; j < arr_label_check.length; j++) {
         const l = arr_label_check[j];
-        u[messages][l] = "**<font color=\"warning\">" + arr_label_check[j] + "</font>**\n";
+        u["messages"][l] = "**<font color=\"warning\">" + arr_label_check[j] + "</font>**\n";
     }
     return u;
 }
