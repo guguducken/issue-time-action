@@ -243,15 +243,15 @@ async function sendWeComMessage(uri, type, message, mentions) {
             break;
     }
     core.info(JSON.stringify(payload));
-    // try {
-    //     axios.post(uri, JSON.stringify(payload), {
-    //         Headers: {
-    //             'Content-Type': 'application/json'
-    //         }
-    //     });
-    // } catch (err) {
-    //     core.info(err.message);
-    // }
+    try {
+        axios.post(uri, JSON.stringify(payload), {
+            Headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    } catch (err) {
+        core.info(err.message);
+    }
 }
 
 //the format of t is object Date
