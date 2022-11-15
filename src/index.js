@@ -15,7 +15,7 @@ const type_message = core.getInput('type', { required: false });
 const mentions_l = core.getInput('mentions', { required: false });
 const cor = JSON.parse(core.getInput('corresponding', { required: true }));
 
-core.info(cor);
+core.info(JSON.stringify(cor));
 
 
 // const repo = github.context.repo
