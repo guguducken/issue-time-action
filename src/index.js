@@ -155,7 +155,7 @@ function userInit(login) {
     let u = {
         weCom: cor[login],
         total: 0,
-        messages: {}
+        messages: Object.create(null)
     };
     for (let j = 0; j < arr_label_check.length; j++) {
         const l = arr_label_check[j];
