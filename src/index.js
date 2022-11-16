@@ -166,7 +166,7 @@ function userInit(login) {
         for (let j = 0; j < arr_label_check.length; j++) {
             const l = arr_label_check[j];
             u["messages"][repo.fullname][l] = {
-                body: "**<font color=\"warning\">" + arr_label_check[j] + "</font>**\n",
+                body: "----- **<font color=\"warning\">" + arr_label_check[j] + "</font>** -----\n",
                 num: 0
             }
         }
@@ -458,11 +458,16 @@ async function main() {
         let u = mess_warn[key];
         let m = "";
         let total = 0;
+        let count = 0;
         for (const repo in u.messages) {
             if (u.messages[repo]["total"] == 0) {
                 continue;
             }
-            m += `===== ${repo} =====\n`;
+            if (count != 0) {
+                m += `********************\n`;
+            }
+            count++;
+            m += `===== \`${repo}\` =====\n`;
             for (const label in u.messages[repo]) {
                 if (u.messages[repo][label]["num"] > 0) {
                     m += u.messages[repo][label]["body"];
