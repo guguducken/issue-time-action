@@ -22,11 +22,8 @@ inputs:
   label_check:
     description: "the label of issue which need to check"
     required: true
-  repo_name:
+  repos:
     description: "the repo"
-    required: true
-  repo_owner:
-    description: "the owner of repo"
     required: true
   mentions:
     description: "mention list"

@@ -5,8 +5,7 @@ const axios = require('axios');
 //get variables
 const uri_warn = core.getInput('uri_warn', { required: true });
 const token = core.getInput('token_action', { required: true });
-const repo_name = core.getInput('repo_name', { required: true });
-const repo_owner = core.getInput('repo_owner', { required: true });
+const str_repos = core.getInput('repos', { required: true });
 const warn_time = core.getInput('warning_time', { required: true });
 const label_check = core.getInput('label_check', { required: true });
 const label_skip = core.getInput('label_skip', { required: false });
@@ -18,9 +17,14 @@ const cor = JSON.parse(core.getInput('corresponding', { required: true }));
 
 
 // const repo = github.context.repo
-const repo = {
-    repo: repo_name,
-    owner: repo_owner
+let repos = new Array();
+
+class repo_t {
+    constructor(repo, owner, fullname) {
+        this.repo = repo;
+        this.owner = owner;
+        this.fullname = fullname;
+    }
 }
 
 
@@ -63,21 +67,26 @@ function checkFirst() {
     if (uri_warn.length == 0) {
         throw new Error("The Webhook of error notice(uri_error) is invalid");
     }
+    let t = str_repos.split(",");
+    for (let i = 0; i < t.length; i++) {
+        const e = t[i].split("/");
+        let repo = new repo_t(e[0], e[1], t[i]);
+        repos.push(repo);
+    }
     core.info("First check pass....");
 }
+//全局变量，方便整合消息
+let mess_warn = {};
+let mention_message = "";
 
-async function main() {
+
+async function run(repo) {
     try {
-        //check input
-        checkFirst();
-
         let num_warn = 0;
         let num_sum = 0;
 
-        //coding
-        let mention_message = "";
+        mention_message += "---> " + repo.fullname + " <---\n"
 
-        let mess_warn = {};
         let num_warn_split = new Array(t_warn.length);
         for (let i = 0; i < arr_label_check.length; i++) {
             num_warn_split[i] = 0;
@@ -87,7 +96,7 @@ async function main() {
             let now = 1;
 
             while (true) {
-                let issues = await getIssues(now, per_page, arr_label_check[k]);
+                let issues = await getIssues(now, per_page, arr_label_check[k], repo);
                 if (issues === undefined) {
                     core.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>> Job finish <<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                     break;
@@ -102,7 +111,7 @@ async function main() {
 
                     //检查更新时间
                     core.info("issue number: " + e.number);
-                    let time_update = await getLastPRCommitUpdateTime(e);
+                    let time_update = await getLastPRCommitUpdateTime(e, repo);
                     if (time_update === null) {
                         time_update = {
                             updatedAt: e.created_at,
@@ -115,36 +124,22 @@ async function main() {
                             //初始化对象，设置login和对应的不同label的初始message
                             mess_warn[e.assignee.login] = userInit(e.assignee.login)
                         }
-                        mess_warn[e.assignee.login]["messages"][arr_label_check[k]]["body"] += m;
-                        mess_warn[e.assignee.login]["messages"][arr_label_check[k]]["num"]++;
-
-                        mess_warn[e.assignee.login]["total"]++;
+                        mess_warn[e.assignee.login]["messages"][repo.fullname][arr_label_check[k]]["body"] += m;
+                        mess_warn[e.assignee.login]["messages"][repo.fullname][arr_label_check[k]]["num"]++;
 
                         //统计每一个label对应的issue的个数
                         num_warn_split[k]++;
                         //统计总的warning的数量
                         num_warn++;
-                        core.info(">>> Warning " + num_warn + " issue: " + e.number + " - " + e.title + " update time: " + time_update.updatedAt);
+                        core.info(">>> " + repo.fullname + " Warning " + num_warn + " issue: " + e.number + " - " + e.title + " update time: " + time_update.updatedAt);
                     }
                 }
             }
             mention_message += arr_label_check[k] + " total: " + num_warn_split[k] + "\n";
         }
-        //send message which group by assignee
-        for (const key in mess_warn) {
-            let u = mess_warn[key];
-            let m = "";
-            for (const key in u.messages) {
-                if (u.messages[key]["num"] > 0) {
-                    m += u.messages[key]["body"];
-                }
-            }
-            sendWeComMessage(uri_warn, type_message, assignAndTotal(m, u.total, u.weCom));
-        }
-        sendWeComMessage(uri_warn, "text", mention_message, arr_mention);
+        core.info(repo.fullname + " total warning: " + num_warn);
+        core.info(repo.fullname + " total issues: " + num_sum);
 
-        core.info("total warning: " + num_warn);
-        core.info("total issues: " + num_sum);
     } catch (err) {
         core.setFailed(err.message);
     }
@@ -159,21 +154,24 @@ function assignAndTotal(message, total, assign) {
 function userInit(login) {
     let u = {
         weCom: cor[login],
-        total: 0,
         messages: {}
     };
-    for (let j = 0; j < arr_label_check.length; j++) {
-        const l = arr_label_check[j];
-        u["messages"][l] = {
-            body: "**<font color=\"warning\">" + arr_label_check[j] + "</font>**\n",
-            num: 0
+    for (let i = 0; i < repos.length; i++) {
+        const repo = repos[i];
+        u["messages"][repo.fullname] = {};
+        for (let j = 0; j < arr_label_check.length; j++) {
+            const l = arr_label_check[j];
+            u["messages"][repo.fullname][l] = {
+                body: "**<font color=\"warning\">" + arr_label_check[j] + "</font>**\n",
+                num: 0
+            }
         }
     }
     return u;
 }
 
 //get issues by issue
-async function getIssues(now, num_page, label) {
+async function getIssues(now, num_page, label, repo) {
     const { data: iss } = await oc.rest.issues.listForRepo(
         {
             ...repo,
@@ -243,15 +241,15 @@ async function sendWeComMessage(uri, type, message, mentions) {
         default:
             break;
     }
-    try {
-        axios.post(uri, JSON.stringify(payload), {
-            Headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-    } catch (err) {
-        core.info(err.message);
-    }
+    // try {
+    //     axios.post(uri, JSON.stringify(payload), {
+    //         Headers: {
+    //             'Content-Type': 'application/json'
+    //         }
+    //     });
+    // } catch (err) {
+    //     core.info(err.message);
+    // }
 }
 
 //the format of t is object Date
@@ -365,7 +363,7 @@ function skipLabel(issue) {
 
 }
 
-async function getLastPRCommitUpdateTime(issue) {
+async function getLastPRCommitUpdateTime(issue, repo) {
     let query = `query ($repo: String!, $repo_owner: String!, $number_iss: Int!, $Last: Int, $Course: String) {
   repository(name: $repo, owner: $repo_owner) {
     issue(number: $number_iss) {
@@ -440,6 +438,33 @@ async function getLastPRCommitUpdateTime(issue) {
     }
 
     return lastPRORCommit;
+}
+
+async function main() {
+    //check input
+    checkFirst();
+
+    for (let i = 0; i < repos.length; i++) {
+        const repo = repos[i];
+        await run(repo);
+    }
+    //send message which group by assignee
+    for (const key in mess_warn) {
+        let u = mess_warn[key];
+        let m = "";
+        let total = 0;
+        for (const repo in u.messages) {
+            m += `===== ${repo} =====\n`;
+            for (const label in u.messages[repo]) {
+                if (u.messages[repo][label]["num"] > 0) {
+                    m += u.messages[repo][label]["body"];
+                    total += u.messages[repo][label]["num"];
+                }
+            }
+        }
+        sendWeComMessage(uri_warn, type_message, assignAndTotal(m, total, u.weCom));
+    }
+    sendWeComMessage(uri_warn, "text", mention_message, arr_mention);
 }
 
 main();
