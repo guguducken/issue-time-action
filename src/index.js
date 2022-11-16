@@ -443,6 +443,7 @@ async function getLastPRCommitUpdateTime(issue, repo) {
 async function main() {
     //check input
     checkFirst();
+    core.info(JSON.stringify(repos));
 
     for (let i = 0; i < repos.length; i++) {
         const repo = repos[i];
