@@ -126,6 +126,8 @@ async function run(repo) {
                         }
                         mess_warn[e.assignee.login]["messages"][repo.fullname][arr_label_check[k]]["body"] += m;
                         mess_warn[e.assignee.login]["messages"][repo.fullname][arr_label_check[k]]["num"]++;
+                        mess_warn[e.assignee.login]["messages"][repo.fullname]["total"]++;
+
 
                         //统计每一个label对应的issue的个数
                         num_warn_split[k]++;
@@ -158,7 +160,9 @@ function userInit(login) {
     };
     for (let i = 0; i < repos.length; i++) {
         const repo = repos[i];
-        u["messages"][repo.fullname] = {};
+        u["messages"][repo.fullname] = {
+            total: 0
+        };
         for (let j = 0; j < arr_label_check.length; j++) {
             const l = arr_label_check[j];
             u["messages"][repo.fullname][l] = {
@@ -456,6 +460,9 @@ async function main() {
         let m = "";
         let total = 0;
         for (const repo in u.messages) {
+            if (u.messages["repo"]["total"] == 0) {
+                continue;
+            }
             m += `===== ${repo} =====\n`;
             for (const label in u.messages[repo]) {
                 if (u.messages[repo][label]["num"] > 0) {
