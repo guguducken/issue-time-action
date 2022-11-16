@@ -85,7 +85,7 @@ async function run(repo) {
         let num_warn = 0;
         let num_sum = 0;
 
-        mention_message += "---> " + repo.fullname + " <---\n"
+        mention_message += "<font color=\"warning\">" + repo.fullname + "</font>\n"
 
         let num_warn_split = new Array(t_warn.length);
         for (let i = 0; i < arr_label_check.length; i++) {
@@ -98,7 +98,7 @@ async function run(repo) {
             while (true) {
                 let issues = await getIssues(now, per_page, arr_label_check[k], repo);
                 if (issues === undefined) {
-                    core.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>> Job finish <<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+                    core.info(`>>>>>>>>>>>>>>>>>>>> Job ${arr_label_check[k]} Finish <<<<<<<<<<<<<<<<<<<<`);
                     break;
                 }
                 now++;
@@ -137,10 +137,11 @@ async function run(repo) {
                     }
                 }
             }
-            mention_message += arr_label_check[k] + " total: " + num_warn_split[k] + "\n";
+            mention_message += ">" + arr_label_check[k] + " total: <font >" + num_warn_split[k] + "\n";
         }
         core.info(repo.fullname + " total warning: " + num_warn);
         core.info(repo.fullname + " total issues: " + num_sum);
+        core.info(`*******************************************`);
 
     } catch (err) {
         core.setFailed(err.message);
@@ -148,7 +149,7 @@ async function run(repo) {
 }
 
 function assignAndTotal(message, total, assign) {
-    message += `-------------------------------------\nTotal: ${total}\nAssignee: <@${assign}>`;
+    message += `-------------------------------------\nTotal: ${total}\nAssignee: <@${assign}>\n`;
     return message
 }
 
@@ -238,6 +239,12 @@ async function sendWeComMessage(uri, type, message, mentions) {
             core.info(JSON.stringify(payload));
             break;
         case "markdown":
+            if (mentions !== undefined && mentions.length != 0) {
+                for (let i = 0; i < mentions.length; i++) {
+                    const mention = mentions[i];
+                    message += "<@" + mention + ">";
+                }
+            }
             payload.markdown = {
                 content: message
             };
@@ -478,7 +485,7 @@ async function main() {
         m = assignAndTotal(m, total, u.weCom)
         sendWeComMessage(uri_warn, type_message, m);
     }
-    sendWeComMessage(uri_warn, "text", mention_message, arr_mention);
+    sendWeComMessage(uri_warn, type_message, mention_message, arr_mention);
 }
 
 main();
