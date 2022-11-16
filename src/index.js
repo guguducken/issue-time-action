@@ -464,7 +464,9 @@ async function main() {
                 }
             }
         }
-        sendWeComMessage(uri_warn, type_message, assignAndTotal(m, total, u.weCom));
+        m = assignAndTotal(m, total, u.weCom)
+        core.info(m);
+        sendWeComMessage(uri_warn, type_message, m);
     }
     sendWeComMessage(uri_warn, "text", mention_message, arr_mention);
 }
