@@ -451,8 +451,8 @@ async function main() {
     }
     //send message which group by assignee
     for (const key in mess_warn) {
-        core.info(JSON.stringify(u));
         let u = mess_warn[key];
+        core.info(JSON.stringify(u));
         let m = "";
         let total = 0;
         for (const repo in u.messages) {
