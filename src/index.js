@@ -85,7 +85,7 @@ async function run(repo) {
         let num_warn = 0;
         let num_sum = 0;
 
-        mention_message += "<font color=\"warning\">" + repo.fullname + "</font>\n"
+        mention_message += "\`" + repo.fullname + "\`\n"
 
         let num_warn_split = new Array(t_warn.length);
         for (let i = 0; i < arr_label_check.length; i++) {
@@ -137,7 +137,7 @@ async function run(repo) {
                     }
                 }
             }
-            mention_message += ">" + arr_label_check[k] + " total: " + num_warn_split[k] + "\n";
+            mention_message += arr_label_check[k] + " total: \`" + num_warn_split[k] + "\`\n";
         }
         core.info(repo.fullname + " total warning: " + num_warn);
         core.info(repo.fullname + " total issues: " + num_sum);
