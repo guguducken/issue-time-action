@@ -460,7 +460,7 @@ async function main() {
         let m = "";
         let total = 0;
         for (const repo in u.messages) {
-            if (u.messages["repo"]["total"] == 0) {
+            if (u.messages[repo]["total"] == 0) {
                 continue;
             }
             m += `===== ${repo} =====\n`;
