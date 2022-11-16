@@ -20,7 +20,7 @@ const cor = JSON.parse(core.getInput('corresponding', { required: true }));
 let repos = new Array();
 
 class repo_t {
-    constructor(repo, owner, fullname) {
+    constructor(owner, repo, fullname) {
         this.repo = repo;
         this.owner = owner;
         this.fullname = fullname;
