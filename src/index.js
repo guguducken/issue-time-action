@@ -245,15 +245,15 @@ async function sendWeComMessage(uri, type, message, mentions) {
         default:
             break;
     }
-    // try {
-    //     axios.post(uri, JSON.stringify(payload), {
-    //         Headers: {
-    //             'Content-Type': 'application/json'
-    //         }
-    //     });
-    // } catch (err) {
-    //     core.info(err.message);
-    // }
+    try {
+        axios.post(uri, JSON.stringify(payload), {
+            Headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    } catch (err) {
+        core.info(err.message);
+    }
 }
 
 //the format of t is object Date
@@ -456,7 +456,6 @@ async function main() {
     //send message which group by assignee
     for (const key in mess_warn) {
         let u = mess_warn[key];
-        core.info(JSON.stringify(u));
         let m = "";
         let total = 0;
         for (const repo in u.messages) {
@@ -472,7 +471,6 @@ async function main() {
             }
         }
         m = assignAndTotal(m, total, u.weCom)
-        core.info(m);
         sendWeComMessage(uri_warn, type_message, m);
     }
     sendWeComMessage(uri_warn, "text", mention_message, arr_mention);
