@@ -137,7 +137,7 @@ async function run(repo) {
                     }
                 }
             }
-            mention_message += ">" + arr_label_check[k] + " total: <font >" + num_warn_split[k] + "\n";
+            mention_message += ">" + arr_label_check[k] + " total: " + num_warn_split[k];
         }
         core.info(repo.fullname + " total warning: " + num_warn);
         core.info(repo.fullname + " total issues: " + num_sum);
@@ -167,7 +167,7 @@ function userInit(login) {
         for (let j = 0; j < arr_label_check.length; j++) {
             const l = arr_label_check[j];
             u["messages"][repo.fullname][l] = {
-                body: "----- **<font color=\"warning\">" + arr_label_check[j] + "</font>** -----\n",
+                body: "-------------- **<font color=\"warning\">" + arr_label_check[j] + "</font>** --------------\n",
                 num: 0
             }
         }
@@ -471,10 +471,10 @@ async function main() {
                 continue;
             }
             if (count != 0) {
-                m += `********************\n`;
+                m += `***********************************************\n`;
             }
             count++;
-            m += `===== \`${repo}\` =====\n`;
+            m += `============= \`${repo}\` =============\n`;
             for (const label in u.messages[repo]) {
                 if (u.messages[repo][label]["num"] > 0) {
                     m += u.messages[repo][label]["body"];
