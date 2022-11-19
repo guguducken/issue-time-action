@@ -104,7 +104,12 @@ async function run(repo) {
                 now++;
                 for (let i = 0; i < issues.length; i++) {
                     const e = issues[i];
-                    if (e.pull_request !== undefined || skipLabel(e) || !checkMilestone(e) || (e.assignee !== null && !cor.hasOwnProperty(e.assignee.login))) { //跳过后续的检查和发送通知
+                    if (e.assignee === null) {
+                        e.assignee = {
+                            login: e.user.login
+                        }
+                    }
+                    if (e.pull_request !== undefined || skipLabel(e) || !checkMilestone(e) || !cor.hasOwnProperty(e.assignee.login)) { //跳过后续的检查和发送通知
                         continue;
                     }
                     num_sum++;
