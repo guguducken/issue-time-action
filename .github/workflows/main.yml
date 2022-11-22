@@ -6,7 +6,7 @@ on:
 
 jobs:
   ut_coverage:
-    runs-on: mo-centos-128
+    runs-on: 128-1
     name: test
     steps:  
       - run: | 
