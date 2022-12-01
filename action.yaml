@@ -5,32 +5,40 @@ inputs:
   token_action:
     description: "The github access token"
     required: true
-  warning_time:
+  time_warning:
     description: "the time duration which warning people"
     required: true
-  type:
-    description: "the type of message which need to send to robot"
-    required: false
-    default: "markdown"
   uri_warn:
     description: "the webhook_uri which corresponding to robot"
     required: true
-  label_skip:
-    description: "this action will skip check the issue which labeled label_skip"
-    required: false
+  skip_time_check:
+    description: "Enable or disable the check time for skip labels"
+    required: true
     default: ""
+  corresponding:
+    description: "the corresponding for github to wechat"
+    required: true
   label_check:
     description: "the label of issue which need to check"
     required: true
   repos:
     description: "the repo"
     required: true
+  type:
+    description: "the type of message which need to send to robot"
+    required: false
+    default: "markdown"
+  label_skip:
+    description: "this action will skip check the issue which labeled label_skip"
+    required: false
+    default: ""
+  time_skip:
+    description: "this time will skip check the issue which labeled label_skip"
+    required: false
+    default: ""
   mentions:
     description: "mention list"
     required: false
-  corresponding:
-    description: "the corresponding for github to wechat"
-    required: true
   milestones:
     description: "the milestones which need to check"
     required: false

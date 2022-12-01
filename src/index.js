@@ -6,9 +6,11 @@ const axios = require('axios');
 const uri_warn = core.getInput('uri_warn', { required: true });
 const token = core.getInput('token_action', { required: true });
 const str_repos = core.getInput('repos', { required: true });
-const warn_time = core.getInput('warning_time', { required: true });
+const time_warn = core.getInput('time_warning', { required: true });
 const label_check = core.getInput('label_check', { required: true });
 const label_skip = core.getInput('label_skip', { required: false });
+const time_skip = core.getInput('time_skip', { required: false });
+const skip_time_check = core.getInput('skip_time_check', { required: true });
 const milestones = core.getInput('milestones', { required: false });
 const type_message = core.getInput('type', { required: false });
 const mentions_l = core.getInput('mentions', { required: false });
@@ -32,15 +34,17 @@ class repo_t {
 const oc = github.getOctokit(token);
 const arr_label_skip = label_skip.split(",");
 const arr_label_check = label_check.split(",");
-const arr_warn_time = warn_time.split(" ");
 const arr_mention = mentions_l.split(",");
 const arr_milestone = milestones.split(" ");
+const arr_string_warn = time_warn.split(" ");
+const arr_string_skip = time_skip.split(" ");
 
 //get the timestamp of now
-const t_rf = new Date();
-const t_now = t_rf.getTime();
+const t_rfc = new Date();
+const t_now = t_rfc.getTime();
 const day_one = 86400000; //ms
-let t_warn = parseMillSecond(parseArray(arr_warn_time));
+let arr_time_warn = parseMillSecond(parseArray(arr_string_warn));
+let arr_time_skip = parseMillSecond(parseArray(arr_string_skip));
 
 function parseMillSecond(arr) {
     let t = new Array();
@@ -61,8 +65,11 @@ function parseArray(arr) {
 }
 
 function checkFirst() {
-    if (arr_warn_time.length == 0 || arr_label_check.length == 0 || arr_warn_time.length != arr_label_check.length) {
+    if (arr_string_warn.length == 0 || arr_label_check.length == 0 || arr_string_warn.length != arr_label_check.length) {
         throw new Error("The time of warning or the name of label is invalid. Please check your Input")
+    }
+    if (arr_label_skip.length != arr_time_skip.length) {
+        throw new Error("The skip time array is not the same size as the skip label array")
     }
     if (uri_warn.length == 0) {
         throw new Error("The Webhook of error notice(uri_error) is invalid");
@@ -87,7 +94,7 @@ async function run(repo) {
 
         mention_message += "\`" + repo.fullname + "\`\n"
 
-        let num_warn_split = new Array(t_warn.length);
+        let num_warn_split = new Array(arr_time_warn.length);
         for (let i = 0; i < arr_label_check.length; i++) {
             num_warn_split[i] = 0;
         }
@@ -109,9 +116,24 @@ async function run(repo) {
                             login: e.user.login
                         }
                     }
-                    if (e.pull_request !== undefined || skipLabel(e) || !checkMilestone(e) || !cor.hasOwnProperty(e.assignee.login)) { //跳过后续的检查和发送通知
+
+                    if (e.pull_request !== undefined || !checkMilestone(e) || !cor.hasOwnProperty(e.assignee.login)) { //跳过后续的检查和发送通知
                         continue;
                     }
+                    let time_check = 0;
+                    //如果跳过时间检查并且issue有跳过标签
+                    let index_label_skip = skipLabel(e)
+                    if (index_label_skip != -1) {
+                        if (skip_time_check[k] == 1) {
+                            core.info(`skip issue: number--> ${e.number} || title--> ${e.title} ||  reason: label--> ${arr_label_skip[index_label_skip]}`);
+                            continue;
+                        }
+                        if (skip_time_check[k] == 2) {
+                            core.info(`set time_check to ${arr_time_skip[index_label_skip]}`);
+                            time_check = arr_time_skip[index_label_skip];
+                        }
+                    }
+
                     num_sum++;
 
                     //检查更新时间
@@ -122,7 +144,12 @@ async function run(repo) {
                             updatedAt: e.created_at,
                         }
                     }
-                    let check_update = await TimeCheck(time_update.updatedAt, k);
+
+                    if (time_check < arr_time_warn[k]) {
+                        time_check = arr_time_warn[k];
+                    }
+
+                    let check_update = await TimeCheck(time_update.updatedAt, time_check);
                     if (!check_update.check_ans) {
                         let m = await getMessage("warning", issues[i], check_update);
                         if (mess_warn[e.assignee.login] === undefined) {
@@ -270,16 +297,16 @@ async function sendWeComMessage(uri, type, message, mentions) {
 }
 
 //the format of t is object Date
-async function TimeCheck(ti, ind) {
+async function TimeCheck(ti, time_expired) {
     let t_in = Date.parse(ti);
     if (t_in >= t_now) {
         return { in: ti, check_ans: true, pass: undefined }
     }
 
-    let { work, holiday } = getDays(new Date(ti), t_rf);
+    let { work, holiday } = getDays(new Date(ti), t_rfc);
 
-    core.info(`Pass: work--> ${work.pass} == ${work.mile_total}ms || holiday--> ${holiday.pass} == ${holiday.mile_total}ms`);
-    if (work.mile_total > t_warn[ind]) {
+    core.info(`Pass: work--> ${work.pass} == ${work.mile_total}ms || holiday--> ${holiday.pass} == ${holiday.mile_total}ms || target--> ${time_expired}`);
+    if (work.mile_total > time_expired) {
         return { in: ti, check_ans: false, pass: { work, holiday } }
     }
 
@@ -365,18 +392,18 @@ function getDays(start, end) {
 
 function skipLabel(issue) {
     if (label_skip.length == 0) {
-        return false
+        return -1
     }
     for (let i = 0; i < issue.labels.length; i++) {
         const label = issue.labels[i].name;
         for (let j = 0; j < arr_label_skip.length; j++) {
             const e = arr_label_skip[j];
             if (label === e) {
-                return true
+                return j
             }
         }
     }
-    return false
+    return -1
 
 }
 
