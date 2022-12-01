@@ -132,7 +132,7 @@ async function run(repo) {
                             core.info(`skip issue: number--> ${e.number} || title--> ${e.title} ||  reason: label--> ${arr_label_skip[index_label_skip]}`);
                             continue;
                         }
-                        if (skip_time_check[k] == 2) {
+                        if (skip_time_check[k] == 2 || skip_time_check[k] == 3) {
                             core.info(`set time_check to ${arr_time_skip[index_label_skip]}`);
                             time_check = arr_time_skip[index_label_skip];
                         }
