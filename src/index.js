@@ -120,9 +120,13 @@ async function run(repo) {
                     if (e.pull_request !== undefined || !checkMilestone(e) || !cor.hasOwnProperty(e.assignee.login)) { //跳过后续的检查和发送通知
                         continue;
                     }
-                    let time_check = 0;
-                    //如果跳过时间检查并且issue有跳过标签
+                    //检查是否跳过时间检查并且issue有跳过标签
                     let index_label_skip = skipLabel(e)
+                    if (skip_time_check[k] == 3 && index_label_skip == -1) {
+                        core.info(`skip label check mode is 3, and do not have both label ${arr_label_check[k]} and any special label.`);
+                        continue;
+                    }
+                    let time_check = 0;
                     if (index_label_skip != -1) {
                         if (skip_time_check[k] == 1) {
                             core.info(`skip issue: number--> ${e.number} || title--> ${e.title} ||  reason: label--> ${arr_label_skip[index_label_skip]}`);
