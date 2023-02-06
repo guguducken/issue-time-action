@@ -525,9 +525,9 @@ async function main() {
             }
         }
         m = assignAndTotal(m, total, u.weCom)
-        await sendWeComMessage(uri_warn, type_message, m);
+        //await sendWeComMessage(uri_warn, type_message, m);
     }
-    await sendWeComMessage(uri_warn, type_message, mention_message, arr_mention);
+    //await sendWeComMessage(uri_warn, type_message, mention_message, arr_mention);
 }
 
 main();
