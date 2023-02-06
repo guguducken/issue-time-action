@@ -216,7 +216,8 @@ function userInit(login) {
 async function getIssues(now, num_page, label, repo) {
     const { data: iss } = await oc.rest.issues.listForRepo(
         {
-            ...repo,
+            repo: repo.repo,
+            owner: repo.owner,
             state: "open",
             sort: "created",
             direction: "asc",
@@ -460,6 +461,9 @@ async function getLastPRCommitUpdateTime(issue, repo) {
         course = edges[0].cursor;
         for (let i = edges.length - 1; i >= 0; i--) {
             const e = edges[i];
+            if (e == null) {
+                continue
+            }
             if (e.node !== undefined && Object.keys(e.node).length != 0) {
                 if (e.node.source !== undefined && Object.keys(e.node.source).length != 0) {
                     if (Date.parse(e.node.source.updatedAt) > time_last) {
@@ -494,6 +498,7 @@ async function main() {
     core.info(JSON.stringify(repos));
 
     for (let i = 0; i < repos.length; i++) {
+        core.info("Start check repo: " + JSON.stringify(repos[i]));
         const repo = repos[i];
         await run(repo);
     }
