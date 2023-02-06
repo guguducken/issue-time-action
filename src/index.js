@@ -215,7 +215,7 @@ function userInit(login) {
 
 //get issues by issue
 async function getIssues(now, num_page, label, repo) {
-    const { data: iss，status:status } = await oc.rest.issues.listForRepo(
+    const { data: iss, status:status } = await oc.rest.issues.listForRepo(
         {
             repo: repo.repo,
             owner: repo.owner,
