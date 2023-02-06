@@ -215,7 +215,7 @@ function userInit(login) {
 
 //get issues by issue
 async function getIssues(now, num_page, label, repo) {
-    const { data: iss } = await oc.rest.issues.listForRepo(
+    const { data: iss，status:status } = await oc.rest.issues.listForRepo(
         {
             repo: repo.repo,
             owner: repo.owner,
@@ -229,6 +229,10 @@ async function getIssues(now, num_page, label, repo) {
     );
     if (iss.length == 0) {
         return undefined;
+    }
+    if (repo.repo == `MO-Cloud`){
+        core.info(JSON.stringify(iss))
+        core.info(status)
     }
     return iss;
 }
