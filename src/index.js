@@ -108,6 +108,7 @@ async function run(repo) {
                     core.info(`>>>>>>>>>>>>>>>>>>>> Job ${arr_label_check[k]} Finish <<<<<<<<<<<<<<<<<<<<`);
                     break;
                 }
+                core.info(`Get issues of repo ${repo.owner}/${repo.repo} success, total: ${issues.length}`);
                 now++;
                 for (let i = 0; i < issues.length; i++) {
                     const e = issues[i];
