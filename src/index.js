@@ -88,7 +88,7 @@ let mention_message = "";
 
 
 async function run(repo) {
-    try {
+//     try {
         let num_warn = 0;
         let num_sum = 0;
 
@@ -181,9 +181,9 @@ async function run(repo) {
         core.info(`*******************************************`);
         mention_message += "\n";
 
-    } catch (err) {
-        core.setFailed(err.message);
-    }
+//     } catch (err) {
+//         core.setFailed(err.message);
+//     }
 }
 
 function assignAndTotal(message, total, assign) {
