@@ -385,10 +385,10 @@ function getDays(start, end) {
         let holid_start = 7 * day_one - dura_start_one;
         holiday += holid_start;
 
-        let holid_end = dura_end_one - 6 * day_one;
+        let holid_end = dura_end_one - 5 * day_one;
         if (holid_end >= 0) {
             holiday += holid_end;
-            dura_end_one = 6 * day_one;
+            dura_end_one = 5 * day_one;
         }
         work += dura_end_one;
     }
